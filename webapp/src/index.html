@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en" ng-app="nuca">
     <head>
         <meta charset="utf-8">
@@ -21,11 +21,15 @@
         <meta name="description" content="">
         <meta name="keywords" content="">
 
-        
-            <link rel="stylesheet" href="/public/styles/main.css" />
-            <base href="/public/">
-        
-        
+        <!--(if target dev)>
+            <link rel="stylesheet" href="{{baseHref}}styles/main.css" />
+            <base href="{{baseHref}}">
+        <!(endif)-->
+        <!--(if target prod)>
+            <link rel="stylesheet" href="{{baseHref}}styles/main.min.css?{{version}}" />
+            <script> global_version = '{{version}}'; </script>
+            <base href="{{baseHref}}">
+        <!(endif)-->
     </head>
     <body ng-controller="MainController">
         <!--[if lt IE 9]>
@@ -40,10 +44,12 @@
                 <div class="bottom-content" ng-include="'views/footer.html'"></div>
             </section>
         </div>
-        
-            <script src="/public/scripts/vendor.js"></script>
-            <script src="/public/scripts/app.js"></script>
-        
-        
+        <!--(if target dev)>
+            <script src="{{baseHref}}scripts/vendor.js"></script>
+            <script src="{{baseHref}}scripts/app.js"></script>
+        <!(endif)-->
+        <!--(if target prod)>
+            <script src="{{baseHref}}scripts/main.min.js?{{version}}"></script>
+        <!(endif)-->
     </body>
 </html>
