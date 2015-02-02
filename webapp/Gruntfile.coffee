@@ -3,7 +3,7 @@ fs = require("fs")
 module.exports = (grunt) ->
 
   BUILD_PATH = process.env.BUILD_PATH || "../public/"
-  BASE_HREF = process.env.BASE_HREF || "/public/"
+  BASE_HREF = process.env.BASE_HREF || "/"
   
   BUILD_APP_JS = "#{BUILD_PATH}scripts/app.js"
   BUILD_VENDOR_JS = "#{BUILD_PATH}scripts/vendor.js"
@@ -27,7 +27,7 @@ module.exports = (grunt) ->
     "bower_components/moment/min/moment-with-locales.js"
     "bower_components/angular-moment/angular-moment.js"
     "bower_components/toastr/toastr.js"
-    "bower_components/angular-toastr/angular-toastr.js"
+    "bower_components/angular-toastr/dist/angular-toastr.js"
     #"bower_components/angular-facebook/angular-facebook.js"
   ]
 
@@ -163,7 +163,7 @@ module.exports = (grunt) ->
       app: ["src/**/*.coffee"]
 
 
-  grunt.registerTask("build", ["bower", "clean:build", "copy:main", "less:main", "coffee"])
+  grunt.registerTask("build", ["clean:build", "copy:main", "less:main", "coffee"])
   grunt.registerTask("build:dev", ["build", "uglify:dev", "targethtml:dev"])
   grunt.registerTask("build:prod", ["build", "uglify:prod", "targethtml:prod", "clean:js", "cssmin", "clean:css"]) #"revision", 
   

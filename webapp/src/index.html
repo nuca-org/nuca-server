@@ -26,7 +26,7 @@
             <base href="{{baseHref}}">
         <!(endif)-->
         <!--(if target prod)>
-            <link rel="stylesheet" href="{{baseHref}}styles/main.min.css?{{version}}" />
+            <link rel="stylesheet" href="{{baseHref}}styles/main.min.css?" />
             <script> global_version = '{{version}}'; </script>
             <base href="{{baseHref}}">
         <!(endif)-->
@@ -49,7 +49,7 @@
             <script src="{{baseHref}}scripts/app.js"></script>
         <!(endif)-->
         <!--(if target prod)>
-            <script src="{{baseHref}}scripts/main.min.js?{{version}}"></script>
+            <script src="{{baseHref}}scripts/main.min.js?"></script>
         <!(endif)-->
     </body>
 </html>

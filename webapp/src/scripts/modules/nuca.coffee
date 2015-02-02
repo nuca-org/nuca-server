@@ -29,7 +29,7 @@ angular.module 'nuca'
 
   $routeProvider.when '/', controller: 'HomeController', templateUrl: 'views/home.html', redirectTo: angularRedirect, resolve: resolveAuth, label: 'Home'
   #---- sterilization requets ------
-  #$routeProvider.when '/TODO', controller: 'CalendarController', templateUrl: 'views/events/calendar.html', resolve: resolveAuth, label: 'BREADCRUMBS'
+  $routeProvider.when '/calendar', controller: 'CalendarController', templateUrl: 'views/calendar.html', resolve: resolveAuth, label: 'BREADCRUMBS'
   
 
   $routeProvider.otherwise redirectTo: '/'
@@ -56,11 +56,13 @@ angular.module 'nuca'
     toastClass: "toast"
 ]
 
-.config ['$locationProvider', ($locationProvider) ->
-  $locationProvider.html5Mode(true)
-  # TODO evaluate if we need
-  $locationProvider.hashPrefix('!')
-]
+# TODO sry the framework does not support non-angular routing for now
+
+#.config ['$locationProvider', ($locationProvider) ->
+  #$locationProvider.html5Mode(true)
+  ## TODO evaluate if we need
+  #$locationProvider.hashPrefix('!')
+#]
 
 #.config ['FacebookProvider', 'Config', (FacebookProvider, Config) ->
 #  FacebookProvider.init Config.facebookAppId
