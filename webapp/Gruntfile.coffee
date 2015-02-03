@@ -3,7 +3,8 @@ fs = require("fs")
 module.exports = (grunt) ->
 
   BUILD_PATH = process.env.BUILD_PATH || "../public/"
-  BASE_HREF = process.env.BASE_HREF || "/"
+  BASE_HREF_PROD = process.env.BASE_HREF || "/"
+  BASE_HREF_DEV = process.env.BASE_HREF || "/public/"
   
   BUILD_APP_JS = "#{BUILD_PATH}scripts/app.js"
   BUILD_VENDOR_JS = "#{BUILD_PATH}scripts/vendor.js"
@@ -84,16 +85,23 @@ module.exports = (grunt) ->
       main:
         files: LESS_FILES
 
+    revision:
+      options:
+        property: "meta.revision"
+        ref: "HEAD"
+        short: true
+
     targethtml:
       dev:
         options:
           curlyTags:
-            baseHref: BASE_HREF
+            baseHref: BASE_HREF_DEV
         files: TARGET_HTML_FILES
       prod:
         options:
           curlyTags:
-            baseHref: BASE_HREF
+            baseHref: BASE_HREF_PROD            
+            version: "<%= meta.revision %>"
         files: TARGET_HTML_FILES
 
     uglify:
@@ -163,9 +171,9 @@ module.exports = (grunt) ->
       app: ["src/**/*.coffee"]
 
 
-  grunt.registerTask("build", ["clean:build", "copy:main", "less:main", "coffee"])
+  grunt.registerTask("build", ["bower", "clean:build", "copy:main", "less:main", "coffee"])
   grunt.registerTask("build:dev", ["build", "uglify:dev", "targethtml:dev"])
-  grunt.registerTask("build:prod", ["build", "uglify:prod", "targethtml:prod", "clean:js", "cssmin", "clean:css"]) #"revision", 
+  grunt.registerTask("build:prod", ["build", "uglify:prod", "revision", "targethtml:prod", "clean:js", "cssmin", "clean:css"]) #"revision", 
   
   grunt.registerTask("dev", ["build:dev", "watch"])
   grunt.registerTask("prod", ["build:prod"])  
@@ -179,4 +187,5 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks "grunt-contrib-watch"
   grunt.loadNpmTasks "grunt-contrib-cssmin"
   grunt.loadNpmTasks "grunt-targethtml"
-  grunt.loadNpmTasks "grunt-contrib-less"
+  grunt.loadNpmTasks "grunt-contrib-less"  
+  grunt.loadNpmTasks "grunt-git-revision"
