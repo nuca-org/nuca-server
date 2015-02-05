@@ -1,8 +1,4 @@
-## teamlinkr-webapp
-
-This repository is used as a submodule for the [teamlinkr-server](https://github.com/Teamlinkr/teamlinkr-server).
-
-Make sure you read the [coffee style guide](https://github.com/Teamlinkr/teamlinkr-angular/CODING_STYLE.md)
+## nuca-webapp
 
 #### Dev mode
 

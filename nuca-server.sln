@@ -1,27 +1,24 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "nuca-server", "http://localhost:33382", "{D307EF0C-5A5A-4BC1-86D0-1AC22242BF8F}"
+# Visual Studio 2012
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "NucaServer", ".", "{30C82521-7DED-4976-A9EB-BD3F3D73F355}"
 	ProjectSection(WebsiteProperties) = preProject
-		UseIISExpress = "true"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
-		Debug.AspNetCompiler.VirtualPath = "/localhost_33382"
-		Debug.AspNetCompiler.PhysicalPath = "..\nuca-server\"
-		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_33382\"
+		Debug.AspNetCompiler.VirtualPath = "/NucaServer"
+		Debug.AspNetCompiler.PhysicalPath = "..\NucaServer\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\NucaServer\"
 		Debug.AspNetCompiler.Updateable = "true"
 		Debug.AspNetCompiler.ForceOverwrite = "true"
 		Debug.AspNetCompiler.FixedNames = "false"
 		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.VirtualPath = "/localhost_33382"
-		Release.AspNetCompiler.PhysicalPath = "..\nuca-server\"
-		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_33382\"
+		Release.AspNetCompiler.VirtualPath = "/NucaServer"
+		Release.AspNetCompiler.PhysicalPath = "..\NucaServer\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\NucaServer\"
 		Release.AspNetCompiler.Updateable = "true"
 		Release.AspNetCompiler.ForceOverwrite = "true"
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
-		SlnRelativePath = "..\nuca-server\"
+		VWDPort = "49600"
 	EndProjectSection
 EndProject
 Global
@@ -29,8 +26,8 @@ Global
 		Debug|Any CPU = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D307EF0C-5A5A-4BC1-86D0-1AC22242BF8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D307EF0C-5A5A-4BC1-86D0-1AC22242BF8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30C82521-7DED-4976-A9EB-BD3F3D73F355}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30C82521-7DED-4976-A9EB-BD3F3D73F355}.Debug|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,8 +1,10 @@
 development:
   database:
-    name: nuca-server_development
-    host: 127.0.0.1
-    port: 27017
+    name: nuca
+    host: ds037611.mongolab.com
+    port: 37611
+    username: nuca
+    password: nuca123
 
 test:
   database:
