@@ -11,7 +11,7 @@ GEM
     execjs (2.2.2)
     haml (4.0.6)
       tilt
-    ki (0.4.3)
+    ki (0.4.4)
       bson_ext
       bundler (~> 1.5)
       coffee-script
@@ -35,4 +35,4 @@ PLATFORMS
   x64-mingw32
 
 DEPENDENCIES
-  ki (= 0.4.3)
+  ki (= 0.4.4)
