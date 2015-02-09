@@ -18,7 +18,7 @@ angular.module 'nuca.controllers'
     $location.path().toLowerCase()
 
   $scope.$on 'Services:responseError', (event, error) ->
-    toastr.error $translate.instant 'MESSAGES.SERVER_ERROR', {error: '<br/>' + error.status + ' ' + error.statusText}
+    toastr.error 'Server Error <br/>' + error.status + ' ' + error.statusText
 
   #---------------------
   #-- Main -------------

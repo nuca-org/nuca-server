@@ -4,7 +4,7 @@ angular.module 'nuca.services'
   
   mappings = [
     # hospital
-    { name: 'Hospital', url: 'hospitals.json' }
+    { name: 'SterilizationReq', url: 'sterilizationreq.json' }
   ]
  
   createService = (name, url) ->
@@ -15,6 +15,9 @@ angular.module 'nuca.services'
           method: "POST"
         annihilate:
           method: "DELETE"
+        query:  
+          method:'GET'
+          isArray: true  
   
   api = {}
 

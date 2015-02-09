@@ -1,6 +1,6 @@
 require 'ki'
 
-class SterilizationReq < Ki::Model
+class Sterilizationreq < Ki::Model
   #requires :cat
   #requires :status_details
 end

@@ -3,8 +3,7 @@ fs = require("fs")
 module.exports = (grunt) ->
 
   BUILD_PATH = process.env.BUILD_PATH || "../public/"
-  BASE_HREF_PROD = process.env.BASE_HREF || "/"
-  BASE_HREF_DEV = process.env.BASE_HREF || "/public/"
+  BASE_HREF = process.env.BASE_HREF || "/"
   
   BUILD_APP_JS = "#{BUILD_PATH}scripts/app.js"
   BUILD_VENDOR_JS = "#{BUILD_PATH}scripts/vendor.js"
@@ -95,12 +94,12 @@ module.exports = (grunt) ->
       dev:
         options:
           curlyTags:
-            baseHref: BASE_HREF_DEV
+            baseHref: BASE_HREF
         files: TARGET_HTML_FILES
       prod:
         options:
           curlyTags:
-            baseHref: BASE_HREF_PROD            
+            baseHref: BASE_HREF
             version: "<%= meta.revision %>"
         files: TARGET_HTML_FILES
 

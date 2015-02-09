@@ -1,16 +1,13 @@
 angular.module 'nuca.controllers'
 
-.controller 'HomeController', ['$scope', 'API', ($scope, API) ->
+.controller 'HomeController', ['$scope', 'API', 'toastr', ($scope, API, toastr) ->
   $scope.date = new Date()
 
+
   $scope.daiUna = () ->
-
     entry = 
-      name: 'Corhas'
-      location: 
-        address1: 'Corhas'
-        address2: 'Corhas2'
+      reporter_name: 'Corhas'
 
-    API.Hospital.add entry, () ->
+    API.SterilizationReq.add entry, (data) ->
       alert('aaaaa')
 ]
