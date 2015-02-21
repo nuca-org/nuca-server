@@ -28,6 +28,7 @@ module.exports = (grunt) ->
     "bower_components/angular-moment/angular-moment.js"
     "bower_components/toastr/toastr.js"
     "bower_components/angular-toastr/dist/angular-toastr.js"
+    "bower_components/angular-ui-utils/ui-utils.js"
     #"bower_components/angular-facebook/angular-facebook.js"
   ]
 

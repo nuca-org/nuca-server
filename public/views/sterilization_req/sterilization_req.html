@@ -1,0 +1,94 @@
+﻿<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Cerere Nouă</h3>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-6">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="email">Nume</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" ng-model="sterilizationReq.reporter_name" ng-required="true" placeholder="Nume si prenume">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="email">Email</label>
+                        <div class="col-sm-9">
+                            <input type="email" class="form-control" ng-model="sterilizationReq.email">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="email">Număr telefon</label>
+                        <div class="col-sm-9">
+                            <input type="tel" class="form-control" ng-model="sterilizationReq.reporter_phone" ng-required="true" ui-mask="(999) 999-9999">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-9  col-sm-offset-3 checkbox">
+                            <label tooltip="In cazul in care nu puteti captura pisicile introduceti mai jos contactul persoanei care le cunoaste mai bine">
+                                <input type="checkbox" ng-model="sterilizationReq.reporter_cannot_capture">Nu le pot captura
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group" collapse="!sterilizationReq.reporter_cannot_capture">
+                        <label class="control-label col-sm-3" for="email">Nume intermediar</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" ng-model="sterilizationReq.intermediate_name" placeholder="Nume si prenume" ng-required="sterilizationReq.reporter_cannot_capture">
+                        </div>
+                    </div>
+                    <div class="form-group" collapse="!sterilizationReq.reporter_cannot_capture">
+                        <label class="control-label col-sm-3" for="email">Număr telefon intermediar</label>
+                        <div class="col-sm-9">
+                            <input type="tel" class="form-control" ng-model="sterilizationReq.intermediate_phone" ui-mask="(999) 999-9999" ng-required="sterilizationReq.reporter_cannot_capture">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-3 col-sm-9">
+                            <button type="submit" class="btn btn-primary">Trimite Cerere</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-sm-6">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Pisici</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Sex</th>
+                                    <th>Varsta</th>
+                                    <th>Culoare</th>
+                                    <th>Agresiva</th>
+                                    <th>Gestanta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="cat in cats">
+                                    <td>
+                                        <label><input type="radio" ng-model="cat.sex" value="Mascul" class="form-control" />Mascul</label>
+                                        <label><input type="radio" ng-model="cat.sex" value="Femela" class="form-control" />Femela</label>
+                                        <div class="radio">
+                                            <label><input type="radio" ng-model="cat.sex" name="sex" value="Mascul">Mascul</label>
+                                        </div>
+                                        <div class="radio">
+                                            <label><input type="radio" ng-model="cat.sex" name="sex" value="Femela">Femela</label>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <label><input type="number" ng-model="cat.age" />
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

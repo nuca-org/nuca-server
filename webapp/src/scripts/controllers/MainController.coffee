@@ -8,6 +8,12 @@ angular.module 'nuca.controllers'
   $scope.Login = Login
   $scope.copyrightYear = (new Date()).getFullYear();
   
+  $scope.genders = [
+    {name: 'Nu stiu'}
+    {id:'M', name: 'Mascul'}
+    {id:'F', name: 'Femela'}
+  ]
+
   #---------------------
   #-- Util -------------
   #---------------------

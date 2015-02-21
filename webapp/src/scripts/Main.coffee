@@ -7,6 +7,7 @@ angular.module 'nuca', [
     'ui.bootstrap'
     'angularMoment'
     'toastr'
+    'ui.utils'
     #'facebook'
     'nuca.config'
     'nuca.constants'

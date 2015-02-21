@@ -96,7 +96,7 @@ if (!NUCA) {
   NUCA = {};
 }
 
-angular.module('nuca', ['ngResource', 'ngRoute', 'ngAnimate', 'ui.bootstrap', 'angularMoment', 'toastr', 'nuca.config', 'nuca.constants', 'nuca.services', 'nuca.login', 'nuca.controllers']);
+angular.module('nuca', ['ngResource', 'ngRoute', 'ngAnimate', 'ui.bootstrap', 'angularMoment', 'toastr', 'ui.utils', 'nuca.config', 'nuca.constants', 'nuca.services', 'nuca.login', 'nuca.controllers']);
 
 angular.module('nuca.config', []);
 
@@ -107,12 +107,6 @@ angular.module('nuca.services', ['ngResource', 'nuca.config', 'nuca.constants'])
 angular.module('nuca.login', ['nuca.services']);
 
 angular.module('nuca.controllers', []);
-
-angular.module('nuca.controllers').controller('CalendarController', [
-  '$scope', 'API', function($scope, API) {
-    return $scope.date = new Date();
-  }
-]);
 
 angular.module('nuca.controllers').controller('HomeController', [
   '$scope', 'API', 'toastr', function($scope, API, toastr) {
@@ -136,6 +130,17 @@ angular.module('nuca.controllers').controller('MainController', [
     $scope.Constants = Constants;
     $scope.Login = Login;
     $scope.copyrightYear = (new Date()).getFullYear();
+    $scope.genders = [
+      {
+        name: 'Nu stiu'
+      }, {
+        id: 'M',
+        name: 'Mascul'
+      }, {
+        id: 'F',
+        name: 'Femela'
+      }
+    ];
     $scope.goto = function(target) {
       return $location.path(target);
     };
@@ -150,6 +155,24 @@ angular.module('nuca.controllers').controller('MainController', [
       return i = 0;
     };
     return initMain();
+  }
+]);
+
+angular.module('nuca.controllers').controller('SterilizationReq1Controller', [
+  '$scope', 'API', function($scope, API) {
+    $scope.sterilizationReq = {
+      cats: [{}]
+    };
+    $scope.removeCat = function(cat) {
+      var idx;
+      if (confirm('Sunteti sigur ca doriti sa eliminati aceasta pisica')) {
+        idx = $scope.sterilizationReq.cats.indexOf(cat);
+        return $scope.sterilizationReq.cats.splice(idx, 1);
+      }
+    };
+    return $scope.addCat = function() {
+      return $scope.sterilizationReq.cats.push({});
+    };
   }
 ]);
 
@@ -186,9 +209,9 @@ angular.module('nuca').config([
       resolve: resolveAuth,
       label: 'Home'
     });
-    $routeProvider.when('/calendar', {
-      controller: 'CalendarController',
-      templateUrl: 'views/calendar.html',
+    $routeProvider.when('/new_request', {
+      controller: 'SterilizationReq1Controller',
+      templateUrl: 'views/sterilization_req/sterilization_req1.html',
       resolve: resolveAuth,
       label: 'BREADCRUMBS'
     });
@@ -242,9 +265,9 @@ angular.module('nuca.config').constant('Config', {
 });
 
 angular.module('nuca.constants').constant('Constants', {
-  DOMO: {
-    Pending: 0,
-    Confirmed: 1,
+  Sex: {
+    Mascul: 0,
+    Femela: 1,
     Rejected: 2
   }
 });
@@ -265,7 +288,7 @@ angular.module('nuca.services').factory('API', [
     mappings = [
       {
         name: 'SterilizationReq',
-        url: 'sterilizationreq.json'
+        url: 'sterilization_req.json'
       }
     ];
     createService = function(name, url) {

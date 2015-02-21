@@ -2,9 +2,9 @@
 
 .constant 'Constants', {
       
-  DOMO:
-    Pending : 0
-    Confirmed : 1
+  Sex:
+    Mascul : 0
+    Femela : 1
     Rejected : 2
 
 }

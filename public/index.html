@@ -2,18 +2,9 @@
 <html lang="en" ng-app="nuca">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <meta name="HandheldFriendly" content="True" />
-        <!-- Older Palm/Blackberry models and browsers like AvantGo -->
-        <meta name="MobileOptimized" content="320" />
-        <!-- Microsoft Pocket PC -->
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-touch-fullscreen" content="yes">
-        <meta http-equiv="cleartype" content="on" />
-        <!-- Mobile IE font smoothing -->
-           
         <link rel="shortcut icon" href="imgs/TLKR_icofavicon_32x32.ico">
         <title>Nuca App</title>
         <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,300italic,400italic" rel="stylesheet" type="text/css">
@@ -31,15 +22,14 @@
         <!--[if lt IE 9]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <section class="top-header" id="header" ng-include="'views/header.html'">
-        </section>
-        <div class="view-container"> 
-            <section id="content">
-                <div id="top-content" class="top-content" ng-include="'views/breadcrumbs.html'" ng-if="Login.isAuthenticated()"></div>
-                <div ng-view class="main-content animate-fade-up"></div>
-                <div class="bottom-content" ng-include="'views/footer.html'"></div>
-            </section>
-        </div>
+        <div ng-include="'views/header.html'"></div>
+        
+        <div class="container" ng-view>
+
+        </div><!-- /.container -->
+        <div class="bottom-content" ng-include="'views/footer.html'"></div>
+
+
         
             <script src="/scripts/vendor.js"></script>
             <script src="/scripts/app.js"></script>

@@ -1,3 +1,19 @@
-﻿<header class="clearfix">
-    Header
-</header>
+﻿<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" ng-init="navCollapsed = true" ng-click="navCollapsed = !navCollapsed" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">NUCA</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse" collapse="navCollapsed">
+            <ul class="nav navbar-nav">
+                <li ng-class="{'active': getCurrentPath() == '/'}"><a href="/#/" ng-click="navCollapsed = true">Acasa</a></li>
+                <li ng-class="{'active': getCurrentPath() == '/new_request'}"><a href="/#/new_request" ng-click="navCollapsed = true">Cerere Noua</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
