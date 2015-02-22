@@ -33,15 +33,32 @@
                         </div>
                     </div>
                     <div class="form-group" collapse="!sterilizationReq.reporter_cannot_capture">
-                        <label class="control-label col-sm-3" for="email">Nume intermediar</label>
+                        <label class="control-label col-sm-3">Nume intermediar</label>
                         <div class="col-sm-9">
                             <input type="text" class="form-control" ng-model="sterilizationReq.intermediate_name" placeholder="Nume si prenume" ng-required="sterilizationReq.reporter_cannot_capture">
                         </div>
                     </div>
                     <div class="form-group" collapse="!sterilizationReq.reporter_cannot_capture">
-                        <label class="control-label col-sm-3" for="email">Numar telefon intermediar</label>
+                        <label class="control-label col-sm-3">Numar telefon intermediar</label>
                         <div class="col-sm-9">
                             <input type="tel" class="form-control" ng-model="sterilizationReq.intermediate_phone" ui-mask="(999) 999-9999" ng-required="sterilizationReq.reporter_cannot_capture">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-3">Locatie</label>
+                        <div class="col-sm-9 choose-location">
+                            <script type="text/ng-template" id="searchbox.tpl.html">
+                                <input type="text" placeholder="Introduceti adresa" class="form-control">
+                            </script>
+                            <script type="text/ng-template" id="window.tpl.html">
+                                <div ng-controller="WindowCtrl" ng-init="showPlaceDetails(parameter)">{{ place.formatted_address }}</div>
+                            </script>
+                            <ui-gmap-google-map center='map.center' zoom='map.zoom'>
+                                <ui-gmap-search-box template="searchbox.template" events="searchbox.events"></ui-gmap-search-box>
+                                <ui-gmap-markers idkey="map.idkey" models="map.markers" coords="'self'" icon="'icon'" click="'onClicked'"></ui-gmap-markers>
+                                <ui-gmap-window coords="selected" idkey="selected.place_id" templateurl="selected.templateurl"
+                                    templateparameter="selected.templateparameter" options="selected.options" closeclick='selected.closeClick()' ng-cloak>
+                            </ui-gmap-google-map>
                         </div>
                     </div>
                 </div>

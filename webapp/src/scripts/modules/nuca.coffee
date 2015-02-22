@@ -81,3 +81,9 @@ angular.module 'nuca'
     $anchorScroll(); 
     $location.hash('');
 ]
+
+.config (uiGmapGoogleMapApiProvider) ->
+    uiGmapGoogleMapApiProvider.configure
+        key: 'AIzaSyB16sGmIekuGIvYOfNoW9T44377IU2d2Es',
+        v: '3.17',
+        libraries: 'places'

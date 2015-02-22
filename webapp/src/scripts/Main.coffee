@@ -8,6 +8,7 @@ angular.module 'nuca', [
     'angularMoment'
     'toastr'
     'ui.utils'
+    'uiGmapgoogle-maps'
     #'facebook'
     'nuca.config'
     'nuca.constants'

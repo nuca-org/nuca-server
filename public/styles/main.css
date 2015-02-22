@@ -8422,3 +8422,12 @@ a {
 .table-cats {
   min-width: 470px;
 }
+.choose-location {
+  position: relative;
+}
+.choose-location .form-control {
+  width: 250px;
+}
+.choose-location .angular-google-map-container {
+  height: 400px;
+}

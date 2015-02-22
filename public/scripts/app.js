@@ -96,7 +96,7 @@ if (!NUCA) {
   NUCA = {};
 }
 
-angular.module('nuca', ['ngResource', 'ngRoute', 'ngAnimate', 'ui.bootstrap', 'angularMoment', 'toastr', 'ui.utils', 'nuca.config', 'nuca.constants', 'nuca.services', 'nuca.login', 'nuca.controllers']);
+angular.module('nuca', ['ngResource', 'ngRoute', 'ngAnimate', 'ui.bootstrap', 'angularMoment', 'toastr', 'ui.utils', 'uiGmapgoogle-maps', 'nuca.config', 'nuca.constants', 'nuca.services', 'nuca.login', 'nuca.controllers']);
 
 angular.module('nuca.config', []);
 
@@ -160,6 +160,7 @@ angular.module('nuca.controllers').controller('MainController', [
 
 angular.module('nuca.controllers').controller('SterilizationReq1Controller', [
   '$scope', 'API', function($scope, API) {
+    var events;
     $scope.sterilizationReq = {
       cats: [{}]
     };
@@ -170,8 +171,101 @@ angular.module('nuca.controllers').controller('SterilizationReq1Controller', [
         return $scope.sterilizationReq.cats.splice(idx, 1);
       }
     };
-    return $scope.addCat = function() {
+    $scope.addCat = function() {
       return $scope.sterilizationReq.cats.push({});
+    };
+    $scope.selected = {
+      options: {
+        visible: false
+      },
+      templateurl: 'window.tpl.html',
+      templateparameter: {}
+    };
+    $scope.map = {
+      center: {
+        latitude: 40.1451,
+        longitude: -99.6680
+      },
+      zoom: 17,
+      markers: [],
+      idkey: 'place_id'
+    };
+    $scope.options = {
+      scrollwheel: false
+    };
+    events = {
+      places_changed: function(searchBox) {
+        var bounds, marker, newMarkers, place, places;
+        places = searchBox.getPlaces();
+        if (places.length === 0) {
+          return;
+        }
+        newMarkers = [];
+        bounds = new google.maps.LatLngBounds;
+        place = places[0];
+        if (place) {
+          marker = {
+            id: places.indexOf(place),
+            place_id: place.place_id,
+            name: place.name,
+            latitude: place.geometry.location.lat(),
+            longitude: place.geometry.location.lng(),
+            options: {
+              visible: false
+            },
+            templateurl: 'window.tpl.html',
+            templateparameter: place
+          };
+          newMarkers.push(marker);
+          bounds.extend(place.geometry.location);
+          $scope.map.center = {
+            latitude: marker.latitude,
+            longitude: marker.longitude
+          };
+        }
+        $scope.map.bounds = {
+          northeast: {
+            latitude: bounds.getNorthEast().lat(),
+            longitude: bounds.getNorthEast().lng()
+          },
+          southwest: {
+            latitude: bounds.getSouthWest().lat(),
+            longitude: bounds.getSouthWest().lng()
+          }
+        };
+        _.each(newMarkers, function(marker) {
+          marker.closeClick = function() {
+            $scope.selected.options.visible = false;
+            marker.options.visble = false;
+            return $scope.$apply();
+          };
+          marker.onClicked = function() {
+            $scope.selected.options.visible = false;
+            $scope.selected = marker;
+            $scope.selected.options.visible = true;
+          };
+        });
+        $scope.map.markers = newMarkers;
+      }
+    };
+    $scope.searchbox = {
+      template: 'searchbox.tpl.html',
+      events: events
+    };
+    return navigator.geolocation.getCurrentPosition(function(pos) {
+      $scope.map.center = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude
+      };
+    }, function(error) {
+      alert('Unable to get location: ' + error.message);
+    });
+  }
+]).controller('WindowCtrl', [
+  '$scope', function($scope) {
+    $scope.place = {};
+    return $scope.showPlaceDetails = function(param) {
+      return $scope.place = param;
     };
   }
 ]);
@@ -255,7 +349,13 @@ angular.module('nuca').config([
       return $location.hash('');
     });
   }
-]);
+]).config(function(uiGmapGoogleMapApiProvider) {
+  return uiGmapGoogleMapApiProvider.configure({
+    key: 'AIzaSyB16sGmIekuGIvYOfNoW9T44377IU2d2Es',
+    v: '3.17',
+    libraries: 'places'
+  });
+});
 
 angular.module('nuca.config').constant('Config', {
   apiHost: '/',
