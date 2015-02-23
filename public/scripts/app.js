@@ -160,7 +160,6 @@ angular.module('nuca.controllers').controller('MainController', [
 
 angular.module('nuca.controllers').controller('SterilizationReq1Controller', [
   '$scope', 'API', function($scope, API) {
-    var events;
     $scope.sterilizationReq = {
       cats: [{}]
     };
@@ -171,101 +170,104 @@ angular.module('nuca.controllers').controller('SterilizationReq1Controller', [
         return $scope.sterilizationReq.cats.splice(idx, 1);
       }
     };
-    $scope.addCat = function() {
+    return $scope.addCat = function() {
       return $scope.sterilizationReq.cats.push({});
     };
-    $scope.selected = {
-      options: {
-        visible: false
+  }
+]);
+
+angular.module('nuca').directive("locationInput", [
+  "uiGmapGoogleMapApi", function(uiGmapGoogleMapApi) {
+    return {
+      restrict: "E",
+      require: "?ngModel",
+      scope: {
+        ngModel: "="
       },
-      templateurl: 'window.tpl.html',
-      templateparameter: {}
-    };
-    $scope.map = {
-      center: {
-        latitude: 40.1451,
-        longitude: -99.6680
-      },
-      zoom: 17,
-      markers: [],
-      idkey: 'place_id'
-    };
-    $scope.options = {
-      scrollwheel: false
-    };
-    events = {
-      places_changed: function(searchBox) {
-        var bounds, marker, newMarkers, place, places;
-        places = searchBox.getPlaces();
-        if (places.length === 0) {
-          return;
-        }
-        newMarkers = [];
-        bounds = new google.maps.LatLngBounds;
-        place = places[0];
-        if (place) {
-          marker = {
-            id: places.indexOf(place),
-            place_id: place.place_id,
-            name: place.name,
-            latitude: place.geometry.location.lat(),
-            longitude: place.geometry.location.lng(),
-            options: {
-              visible: false
-            },
-            templateurl: 'window.tpl.html',
-            templateparameter: place
-          };
-          newMarkers.push(marker);
-          bounds.extend(place.geometry.location);
-          $scope.map.center = {
-            latitude: marker.latitude,
-            longitude: marker.longitude
+      templateUrl: "scripts/directives/locationInput.html",
+      replace: false,
+      link: function(scope, element, attrs, formCtl) {
+        var reverseGeocode;
+        if (scope.ngModel == null) {
+          scope.ngModel = {
+            latitude: 0,
+            longitude: 0
           };
         }
-        $scope.map.bounds = {
-          northeast: {
-            latitude: bounds.getNorthEast().lat(),
-            longitude: bounds.getNorthEast().lng()
+        reverseGeocode = function() {
+          return uiGmapGoogleMapApi.then(function(maps) {
+            var geocoder, latlng;
+            geocoder = new maps.Geocoder();
+            latlng = new maps.LatLng(scope.marker.coords.latitude, scope.marker.coords.longitude);
+            return geocoder.geocode({
+              'latLng': latlng
+            }, function(results, status) {
+              if (status === google.maps.GeocoderStatus.OK) {
+                return scope.$apply(function() {
+                  if (results[0]) {
+                    return scope.window.content = results[0].formatted_address;
+                  }
+                });
+              } else {
+                return console.log("Geocoder failed due to: " + status);
+              }
+            });
+          });
+        };
+        scope.$watch('ngModel', reverseGeocode, true);
+        scope.map = {
+          center: {
+            latitude: 46.766667,
+            longitude: 23.58333300000004
           },
-          southwest: {
-            latitude: bounds.getSouthWest().lat(),
-            longitude: bounds.getSouthWest().lng()
+          zoom: 17,
+          events: {
+            click: function(map, eventName, args) {
+              return scope.$apply(function() {
+                scope.ngModel.latitude = args[0].latLng.lat();
+                return scope.ngModel.longitude = args[0].latLng.lng();
+              });
+            }
           }
         };
-        _.each(newMarkers, function(marker) {
-          marker.closeClick = function() {
-            $scope.selected.options.visible = false;
-            marker.options.visble = false;
-            return $scope.$apply();
-          };
-          marker.onClicked = function() {
-            $scope.selected.options.visible = false;
-            $scope.selected = marker;
-            $scope.selected.options.visible = true;
-          };
+        scope.marker = {
+          id: 0,
+          options: {
+            draggable: true
+          },
+          coords: scope.ngModel,
+          events: {
+            dragend: function(marker, eventName, args) {}
+          }
+        };
+        scope.window = {
+          options: {
+            visible: true
+          }
+        };
+        scope.searchbox = {
+          events: {
+            places_changed: function(searchBox) {
+              var place;
+              place = searchBox.getPlaces()[0];
+              if (!place) {
+                return;
+              }
+              scope.ngModel.latitude = place.geometry.location.lat();
+              scope.ngModel.longitude = place.geometry.location.lng();
+              return scope.map.center = angular.copy(scope.marker.coords);
+            }
+          }
+        };
+        return navigator.geolocation.getCurrentPosition(function(pos) {
+          return scope.$apply(function() {
+            scope.map.center = {
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude
+            };
+          });
         });
-        $scope.map.markers = newMarkers;
       }
-    };
-    $scope.searchbox = {
-      template: 'searchbox.tpl.html',
-      events: events
-    };
-    return navigator.geolocation.getCurrentPosition(function(pos) {
-      $scope.map.center = {
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude
-      };
-    }, function(error) {
-      alert('Unable to get location: ' + error.message);
-    });
-  }
-]).controller('WindowCtrl', [
-  '$scope', function($scope) {
-    $scope.place = {};
-    return $scope.showPlaceDetails = function(param) {
-      return $scope.place = param;
     };
   }
 ]);

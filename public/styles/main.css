@@ -8429,5 +8429,8 @@ a {
   width: 250px;
 }
 .choose-location .angular-google-map-container {
-  height: 400px;
+  height: 300px;
+}
+.choose-location .angular-google-map-container .window-content {
+  text-wrap: normal;
 }

@@ -46,19 +46,8 @@
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-3">Locatie</label>
-                        <div class="col-sm-9 choose-location">
-                            <script type="text/ng-template" id="searchbox.tpl.html">
-                                <input type="text" placeholder="Introduceti adresa" class="form-control">
-                            </script>
-                            <script type="text/ng-template" id="window.tpl.html">
-                                <div ng-controller="WindowCtrl" ng-init="showPlaceDetails(parameter)">{{ place.formatted_address }}</div>
-                            </script>
-                            <ui-gmap-google-map center='map.center' zoom='map.zoom'>
-                                <ui-gmap-search-box template="searchbox.template" events="searchbox.events"></ui-gmap-search-box>
-                                <ui-gmap-markers idkey="map.idkey" models="map.markers" coords="'self'" icon="'icon'" click="'onClicked'"></ui-gmap-markers>
-                                <ui-gmap-window coords="selected" idkey="selected.place_id" templateurl="selected.templateurl"
-                                    templateparameter="selected.templateparameter" options="selected.options" closeclick='selected.closeClick()' ng-cloak>
-                            </ui-gmap-google-map>
+                        <div class="col-sm-9">
+                            <location-input ng-model="sterilizationReq.location" ng-required="true"></location-input>
                         </div>
                     </div>
                 </div>
