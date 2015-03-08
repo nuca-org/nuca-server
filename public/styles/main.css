@@ -8429,8 +8429,12 @@ a {
   width: 250px;
 }
 .choose-location .angular-google-map-container {
+  border: 1px solid #ccc;
   height: 300px;
 }
 .choose-location .angular-google-map-container .window-content {
   text-wrap: normal;
+}
+.ng-invalid > .choose-location .angular-google-map-container {
+  border-color: #d9534f;
 }

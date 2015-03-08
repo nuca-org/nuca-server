@@ -28,10 +28,15 @@ a {
     }
 
     .angular-google-map-container {
+        border: 1px solid #ccc;
         height: 300px;
 
         .window-content {
             text-wrap: normal;
         }
     }
+}
+
+.ng-invalid > .choose-location .angular-google-map-container {
+    border-color: @brand-danger;
 }

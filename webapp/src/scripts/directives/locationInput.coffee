@@ -13,20 +13,15 @@ angular.module 'nuca'
 
   link: (scope, element, attrs, formCtl) ->
 
-    scope.ngModel ?= {latitude: 0, longitude: 0}
-    
-    reverseGeocode = () ->
-      uiGmapGoogleMapApi.then (maps) ->
-        geocoder = new maps.Geocoder()
-        latlng = new maps.LatLng(scope.marker.coords.latitude, scope.marker.coords.longitude)
-        geocoder.geocode {'latLng': latlng}, (results, status) ->
-          if status == google.maps.GeocoderStatus.OK 
-            scope.$apply () ->
-              scope.window.content = results[0].formatted_address if results[0]
-          else
-            console.log "Geocoder failed due to: " + status
-      
-    scope.$watch 'ngModel', reverseGeocode, true
+    #we may need to define in the controller scope
+    scope.searchbox = 
+      events: 
+        places_changed: (searchBox) ->
+          place = searchBox.getPlaces()[0]
+          return if !place
+          setModel place.geometry.location
+          #center map to location with a copy of the current position
+          scope.map.center = angular.copy scope.ngModel
 
     scope.map = 
       center: 
@@ -36,30 +31,45 @@ angular.module 'nuca'
       events:
         click: (map, eventName, args) ->
           scope.$apply () ->
-            scope.ngModel.latitude = args[0].latLng.lat()
-            scope.ngModel.longitude = args[0].latLng.lng()
+            setModel args[0].latLng
 
     scope.marker = 
       id: 0
       options: 
         draggable: true
-      coords: scope.ngModel
+      coords: scope.ngModel# || {latitude: 0, longitude: 0}
       events:
         dragend: (marker, eventName, args) ->
 
     scope.window =
       options:
         visible: true
-  
-    scope.searchbox = 
-      events: 
-        places_changed: (searchBox) ->
-          place = searchBox.getPlaces()[0]
-          return if !place
-          scope.ngModel.latitude = place.geometry.location.lat()
-          scope.ngModel.longitude = place.geometry.location.lng()
-          #center map to location with a copy of the current position
-          scope.map.center = angular.copy scope.marker.coords
+
+    setModel = (latLng) ->
+      if !scope.ngModel
+        scope.marker.coords = scope.ngModel = {}
+      scope.ngModel.latitude = latLng.lat()
+      scope.ngModel.longitude = latLng.lng()
+
+    reverseGeocode = () ->      
+      return if !scope.ngModel
+      uiGmapGoogleMapApi.then (maps) ->
+        geocoder = new maps.Geocoder()
+        latlng = new maps.LatLng(scope.ngModel.latitude, scope.ngModel.longitude)
+        geocoder.geocode {'latLng': latlng}, (results, status) ->
+          if status == google.maps.GeocoderStatus.OK 
+            scope.$apply () ->
+              scope.window.content = results[0].formatted_address if results[0]
+          else
+            console.log "Geocoder failed due to: " + status
+      
+    scope.$watch 'ngModel', (newValue, oldValue) ->
+      #preset values if they were not initially set
+      if !scope.marker.coords && newValue
+        scope.marker.coords = newValue
+        scope.map.center = angular.copy newValue
+      reverseGeocode()      
+    , true
 
     navigator.geolocation.getCurrentPosition (pos) ->
       scope.$apply () ->

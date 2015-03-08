@@ -29,7 +29,8 @@ angular.module 'nuca'
 
   $routeProvider.when '/', controller: 'HomeController', templateUrl: 'views/home.html', redirectTo: angularRedirect, resolve: resolveAuth, label: 'Home'
   #---- sterilization requets ------
-  $routeProvider.when '/new_request', controller: 'SterilizationReq1Controller', templateUrl: 'views/sterilization_req/sterilization_req1.html', resolve: resolveAuth, label: 'BREADCRUMBS'
+  $routeProvider.when '/cerere_noua', controller: 'SterilizationReq1Controller', templateUrl: 'views/sterilization_req/sterilization_req1.html', resolve: resolveAuth
+  $routeProvider.when '/confirmare_cerere/:id', controller: 'SterilizationReq2Controller', templateUrl: 'views/sterilization_req/sterilization_req2.html', resolve: resolveAuth
   
 
   $routeProvider.otherwise redirectTo: '/'

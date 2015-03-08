@@ -12,7 +12,8 @@
         <div id="navbar" class="collapse navbar-collapse" collapse="navCollapsed">
             <ul class="nav navbar-nav">
                 <li ng-class="{'active': getCurrentPath() == '/'}"><a href="/#/" ng-click="navCollapsed = true">Acasa</a></li>
-                <li ng-class="{'active': getCurrentPath() == '/new_request'}"><a href="/#/new_request" ng-click="navCollapsed = true">Cerere Noua</a></li>
+                <li ng-class="{'active': getCurrentPath() == '/cerere_noua'}"><a href="/#/cerere_noua" ng-click="navCollapsed = true">Cerere Noua</a></li>
+                <li class="active" ng-if="getCurrentPath().indexOf('/confirmare_cerere') != -1"><a>Confirmare Cerere</a></li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>

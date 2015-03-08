@@ -1,9 +1,11 @@
 angular.module 'nuca.controllers'
 
-.controller 'SterilizationReq1Controller', ['$scope', 'API', ($scope, API) ->
+.controller 'SterilizationReq2Controller', ['$scope', '$routeParams', 'API', ($scope, $routeParams, API) ->
 
-  $scope.sterilizationReq = 
-    cats: [{}]
+  loadRequest = () ->
+    API.SterilizationReq.query { id: $routeParams.id }, (data) ->
+      $scope.sterilizationReq = data[0]
+
 
   $scope.removeCat = (cat) ->
     if confirm('Sunteti sigur ca doriti sa stergeti aceasta inregistrare?')
@@ -13,9 +15,10 @@ angular.module 'nuca.controllers'
   $scope.addCat = () ->
     $scope.sterilizationReq.cats.push {}
 
-  $scope.createRequest = () ->
+  $scope.sendRequest = () ->
     API.SterilizationReq.add $scope.sterilizationReq, (data) ->
       console.log data
-      $scope.goto('/confirmare_cerere/' + data.id)
 
+
+  loadRequest()
 ]

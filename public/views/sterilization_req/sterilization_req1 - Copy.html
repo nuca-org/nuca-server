@@ -3,7 +3,8 @@
         <h3 class="panel-title">Cerere Noua</h3>
     </div>
     <div class="panel-body">
-        <form class="form-horizontal" role="form" name="editForm">
+        <form class="form-horizontal" role="form">
+
             <div class="row">
                 <div class="col-lg-6">
                     <div class="form-group">
@@ -104,7 +105,7 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9 col-lg-offset-3 col-lg-6">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block" ng-disabled="!editForm.$dirty || editForm.$invalid" ng-click="createRequest()">Trimite Cerere</button>
+                    <button type="submit" class="btn btn-primary btn-lg btn-block" ng-click="sendRequest()">Trimite Cerere</button>
                 </div>
             </div>
         </form>
