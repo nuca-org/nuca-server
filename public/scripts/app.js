@@ -175,7 +175,6 @@ angular.module('nuca.controllers').controller('SterilizationReq1Controller', [
     };
     return $scope.createRequest = function() {
       return API.SterilizationReq.add($scope.sterilizationReq, function(data) {
-        console.log(data);
         return $scope.goto('/confirmare_cerere/' + data.id);
       });
     };
@@ -202,8 +201,10 @@ angular.module('nuca.controllers').controller('SterilizationReq2Controller', [
     $scope.addCat = function() {
       return $scope.sterilizationReq.cats.push({});
     };
-    $scope.sendRequest = function() {
-      return API.SterilizationReq.add($scope.sterilizationReq, function(data) {
+    $scope.updateRequest = function() {
+      return API.SterilizationReq.update({
+        id: $routeParams.id
+      }, $scope.sterilizationReq, function(data) {
         return console.log(data);
       });
     };
@@ -221,9 +222,9 @@ angular.module('nuca').directive("locationInput", [
       },
       templateUrl: "scripts/directives/locationInput.html",
       replace: false,
-      link: function(scope, element, attrs, formCtl) {
+      controller: function($scope, $element, $attrs) {
         var reverseGeocode, setModel;
-        scope.searchbox = {
+        $scope.searchbox = {
           events: {
             places_changed: function(searchBox) {
               var place;
@@ -232,11 +233,11 @@ angular.module('nuca').directive("locationInput", [
                 return;
               }
               setModel(place.geometry.location);
-              return scope.map.center = angular.copy(scope.ngModel);
+              return $scope.map.center = angular.copy($scope.ngModel);
             }
           }
         };
-        scope.map = {
+        $scope.map = {
           center: {
             latitude: 46.766667,
             longitude: 23.58333300000004
@@ -244,49 +245,49 @@ angular.module('nuca').directive("locationInput", [
           zoom: 17,
           events: {
             click: function(map, eventName, args) {
-              return scope.$apply(function() {
+              return $scope.$apply(function() {
                 return setModel(args[0].latLng);
               });
             }
           }
         };
-        scope.marker = {
+        $scope.marker = {
           id: 0,
           options: {
             draggable: true
           },
-          coords: scope.ngModel,
+          coords: $scope.ngModel,
           events: {
             dragend: function(marker, eventName, args) {}
           }
         };
-        scope.window = {
+        $scope.window = {
           options: {
             visible: true
           }
         };
         setModel = function(latLng) {
-          if (!scope.ngModel) {
-            scope.marker.coords = scope.ngModel = {};
+          if ($scope.ngModel == null) {
+            $scope.ngModel = {};
           }
-          scope.ngModel.latitude = latLng.lat();
-          return scope.ngModel.longitude = latLng.lng();
+          $scope.ngModel.latitude = latLng.lat();
+          return $scope.ngModel.longitude = latLng.lng();
         };
         reverseGeocode = function() {
-          if (!scope.ngModel) {
+          if (!$scope.ngModel) {
             return;
           }
           return uiGmapGoogleMapApi.then(function(maps) {
             var geocoder, latlng;
             geocoder = new maps.Geocoder();
-            latlng = new maps.LatLng(scope.ngModel.latitude, scope.ngModel.longitude);
+            latlng = new maps.LatLng($scope.ngModel.latitude, $scope.ngModel.longitude);
             return geocoder.geocode({
               'latLng': latlng
             }, function(results, status) {
               if (status === google.maps.GeocoderStatus.OK) {
-                return scope.$apply(function() {
+                return $scope.$apply(function() {
                   if (results[0]) {
-                    return scope.window.content = results[0].formatted_address;
+                    return $scope.window.content = results[0].formatted_address;
                   }
                 });
               } else {
@@ -295,16 +296,16 @@ angular.module('nuca').directive("locationInput", [
             });
           });
         };
-        scope.$watch('ngModel', function(newValue, oldValue) {
-          if (!scope.marker.coords && newValue) {
-            scope.marker.coords = newValue;
-            scope.map.center = angular.copy(newValue);
+        $scope.$watch('ngModel', function(newValue, oldValue) {
+          if (!$scope.marker.coords && newValue) {
+            $scope.marker.coords = newValue;
+            $scope.map.center = angular.copy(newValue);
           }
           return reverseGeocode();
         }, true);
         return navigator.geolocation.getCurrentPosition(function(pos) {
-          return scope.$apply(function() {
-            scope.map.center = {
+          return $scope.$apply(function() {
+            $scope.map.center = {
               latitude: pos.coords.latitude,
               longitude: pos.coords.longitude
             };
@@ -443,7 +444,7 @@ angular.module('nuca.services').factory('API', [
     createService = function(name, url) {
       return $resource(Config.apiHost + url, {}, {
         update: {
-          method: "PATCH"
+          method: "PUT"
         },
         add: {
           method: "POST"

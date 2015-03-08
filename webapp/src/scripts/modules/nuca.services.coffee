@@ -10,7 +10,7 @@ angular.module 'nuca.services'
   createService = (name, url) ->
     return $resource Config.apiHost + url, {},
         update:
-          method: "PATCH"
+          method: "PUT"
         add:
           method: "POST"
         annihilate:

@@ -15,7 +15,6 @@ angular.module 'nuca.controllers'
 
   $scope.createRequest = () ->
     API.SterilizationReq.add $scope.sterilizationReq, (data) ->
-      console.log data
       $scope.goto('/confirmare_cerere/' + data.id)
 
 ]

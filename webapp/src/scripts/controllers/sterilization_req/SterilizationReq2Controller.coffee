@@ -15,8 +15,8 @@ angular.module 'nuca.controllers'
   $scope.addCat = () ->
     $scope.sterilizationReq.cats.push {}
 
-  $scope.sendRequest = () ->
-    API.SterilizationReq.add $scope.sterilizationReq, (data) ->
+  $scope.updateRequest = () ->
+    API.SterilizationReq.update { id: $routeParams.id }, $scope.sterilizationReq, (data) ->
       console.log data
 
 
