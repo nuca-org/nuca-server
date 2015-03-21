@@ -48,6 +48,9 @@ angular.module 'nuca'
       $scope.ngModel ?= {}
       $scope.ngModel.latitude = latLng.lat()
       $scope.ngModel.longitude = latLng.lng()
+      #hack to set the form dirty, could not link ngModel 
+      #because we are using controller for google maps
+      $scope.$parent.editForm.$setDirty()
 
     reverseGeocode = () -> 
       return if !$scope.ngModel

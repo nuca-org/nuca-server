@@ -83,7 +83,7 @@
                             <div class="dropdown" dropdown is-open="request_date_open">
                                 <a class="dropdown-toggle" dropdown-toggle>
                                     <div class="input-group">
-                                        <input type="text" class="form-control" ng-model="sterilizationReq.request_date"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                        <span class="form-control">{{ sterilizationReq.request_date | amDateFormat:'DD MMMM, YYYY HH:mm' }}</span><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
                                     </div>
                                 </a>
                                 <ul class="dropdown-menu">

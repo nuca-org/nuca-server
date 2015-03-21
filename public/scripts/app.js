@@ -264,7 +264,8 @@ angular.module('nuca').directive("locationInput", [
             $scope.ngModel = {};
           }
           $scope.ngModel.latitude = latLng.lat();
-          return $scope.ngModel.longitude = latLng.lng();
+          $scope.ngModel.longitude = latLng.lng();
+          return $scope.$parent.editForm.$setDirty();
         };
         reverseGeocode = function() {
           if (!$scope.ngModel) {
