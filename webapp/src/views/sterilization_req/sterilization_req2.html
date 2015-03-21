@@ -7,98 +7,136 @@
 
             <div class="row">
                 <div class="col-lg-6">
+                    <accordion ng-init="prevDetailsOpen = false">
+                        <accordion-group heading="Dynamic Body Content" is-open="prevDetailsOpen">
+                            <accordion-heading>
+                                <div tooltip="Faceti click in cazul in care doriti sa modificati informatiile introduse in cererea initiala">
+                                    {{sterilizationReq.reporter_name + ' (' + sterilizationReq.email + ')'}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': prevDetailsOpen, 'glyphicon-chevron-right': !prevDetailsOpen}"></i>
+                                </div>
+                            </accordion-heading>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" for="email">Nume</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" ng-model="sterilizationReq.reporter_name" placeholder="Nume si prenume">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" for="email">Email</label>
+                                <div class="col-sm-8">
+                                    <input type="email" class="form-control" ng-model="sterilizationReq.email">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-sm-4" for="email">Telefon</label>
+                                <div class="col-sm-8">
+                                    <input type="tel" class="form-control" ng-model="sterilizationReq.reporter_phone" ng-required="true" ui-mask="(999) 999-9999">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8  col-sm-offset-4 checkbox">
+                                    <label tooltip="In cazul in care nu puteti captura pisicile introduceti mai jos contactul persoanei care le cunoaste mai bine">
+                                        <input type="checkbox" ng-model="sterilizationReq.reporter_cannot_capture">Nu le pot captura
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="sterilizationReq.reporter_cannot_capture">
+                                <label class="control-label col-sm-4">Nume intermediar</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" ng-model="sterilizationReq.intermediate_name" placeholder="Nume si prenume" ng-required="sterilizationReq.reporter_cannot_capture">
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="sterilizationReq.reporter_cannot_capture">
+                                <label class="control-label col-sm-4">Telefon intermediar</label>
+                                <div class="col-sm-8">
+                                    <input type="tel" class="form-control" ng-model="sterilizationReq.intermediate_phone" ui-mask="(999) 999-9999" ng-required="sterilizationReq.reporter_cannot_capture">
+                                </div>
+                            </div>
+                        </accordion-group>
+                    </accordion>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="email">Nume</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" ng-model="sterilizationReq.reporter_name" ng-readonly="true" placeholder="Nume si prenume">
+                        <label class="control-label col-sm-4">Numar pisici</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" ng-model="sterilizationReq.cats_no" min="1" max="100">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="email">Email</label>
-                        <div class="col-sm-9">
-                            <input type="email" class="form-control" ng-model="sterilizationReq.email" ng-readonly="true">
+                        <label class="control-label col-sm-4">Pisici confirmate</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" ng-model="sterilizationReq.confirmed_cats_no" min="1" max="100">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3" for="email">Numar telefon</label>
-                        <div class="col-sm-9">
-                            <input type="tel" class="form-control" ng-model="sterilizationReq.reporter_phone" ng-required="true" ui-mask="(999) 999-9999">
+                        <label class="control-label col-sm-4">Numar custi</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" ng-model="sterilizationReq.cage_no" min="1" max="100">
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-9  col-sm-offset-3 checkbox">
-                            <label tooltip="In cazul in care nu puteti captura pisicile introduceti mai jos contactul persoanei care le cunoaste mai bine">
-                                <input type="checkbox" ng-model="sterilizationReq.reporter_cannot_capture">Nu le pot captura
+                        <label class="control-label col-sm-4">Custi capcana</label>
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" ng-model="sterilizationReq.trap_cage_no" min="1" max="100">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label col-sm-4">Data/Timp</label>
+                        <div class="col-sm-8">
+                            <!--<p class="input-group">
+                                <input type="text" class="form-control" datepicker-popup="dd.MM.yyyy" ng-model="sterilizationReq.request_date" is-open="date_opened" ng-required="true" close-text="Inchide" />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                </span>
+                            </p>-->
+
+                            <div class="dropdown" dropdown is-open="request_date_open">
+                                <a class="dropdown-toggle" dropdown-toggle>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" value="{{ sterilizationReq.request_date | date:'dd MMMM, yyyy HH:mm' }}"><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <datetimepicker ng-model="sterilizationReq.request_date" on-set-time="request_date_open = false" />
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-8  col-sm-offset-4 checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="sterilizationReq.reporter_can_transport">Pot oferi transport
                             </label>
                         </div>
                     </div>
-                    <div class="form-group" collapse="!sterilizationReq.reporter_cannot_capture">
-                        <label class="control-label col-sm-3">Nume intermediar</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" ng-model="sterilizationReq.intermediate_name" placeholder="Nume si prenume" ng-required="sterilizationReq.reporter_cannot_capture">
-                        </div>
-                    </div>
-                    <div class="form-group" collapse="!sterilizationReq.reporter_cannot_capture">
-                        <label class="control-label col-sm-3">Numar telefon intermediar</label>
-                        <div class="col-sm-9">
-                            <input type="tel" class="form-control" ng-model="sterilizationReq.intermediate_phone" ui-mask="(999) 999-9999" ng-required="sterilizationReq.reporter_cannot_capture">
-                        </div>
-                    </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3">Locatie</label>
-                        <div class="col-sm-9">
-                            <location-input ng-model="sterilizationReq.location" ng-required="true"></location-input>
+                        <div class="col-sm-8  col-sm-offset-4 checkbox">
+                            <label>
+                                <input type="checkbox" ng-model="sterilizationReq.reporter_can_acomodate">Pot oferi acomodare
+                            </label>
                         </div>
                     </div>
+
                 </div>
                 <div class="col-lg-6 col-lg-offset-0 col-sm-offset-3">
                     <div class="panel panel-info">
                         <div class="panel-heading">
-                            <h3 class="panel-title">Despre Pisici</h3>
+                            <h3 class="panel-title">Locatie</h3>
                         </div>
                         <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-condensed table-striped table-cats">
-                                    <thead>
-                                        <tr>
-                                            <th>Sex</th>
-                                            <th>Varsta</th>
-                                            <th>Culoare</th>
-                                            <th></th>
-                                            <th></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr ng-repeat="cat in sterilizationReq.cats">
-                                            <td class="col-xs-3">
-                                                <select ng-model="cat.gender" class="form-control" ng-options="gender.id as gender.name for gender in genders"></select>
-                                            </td>
-                                            <td class="col-xs-2">
-                                                <input type="text" class="form-control" ng-model="cat.age">
-                                            </td>
-                                            <td class="col-xs-4">
-                                                <input type="text" class="form-control" ng-model="cat.color">
-                                            </td>
-                                            <td class="col-xs-2">
-                                                <div class="checkbox">
-                                                    <label><input type="checkbox" ng-model="cat.aggressive">Agresiva</label>
-                                                </div>
-                                                <div class="checkbox">
-                                                    <label><input type="checkbox" ng-model="cat.pregnant">Gestanta</label>
-                                                </div>
-                                            </td>
-                                            <td class="col-xs-1">
-                                                <a ng-click="removeCat(cat)"><span class="fa fa-2x fa-trash"></span></a>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <button type="button" class="btn btn-default" ng-click="addCat()">Adauga Pisica</button>
-                                </div>
-                            </div>
+                            <location-input ng-model="sterilizationReq.location" ng-required="true"></location-input>
+                        </div>
+                    </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Poze</h3>
+                        </div>
+                        <div class="panel-body">
+                            <pictures-input ng-model="sterilizationReq.pictures"></pictures-input>
+                        </div>
+                    </div>
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Despre Pisici</h3>
+                        </div>
+                        <div class="panel-body" ng-include="'views/sterilization_req/_templates/cats.html'">
                         </div>
                     </div>
                 </div>

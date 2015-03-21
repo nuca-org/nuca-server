@@ -74,8 +74,9 @@ angular.module 'nuca'
     return $sce.trustAsHtml(input);
 ]
 
-.run ['$rootScope', '$location', '$anchorScroll', ($rootScope, $location, $anchorScroll) ->
-
+.run ['$rootScope', '$location', '$anchorScroll', 'amMoment', ($rootScope, $location, $anchorScroll, amMoment) ->
+  
+  amMoment.changeLocale('ro');
   #scroll back to the top of the content upon view change
   $rootScope.$on '$routeChangeSuccess', (newRoute, oldRoute) ->
     $location.hash('top-content');
@@ -88,3 +89,4 @@ angular.module 'nuca'
         key: 'AIzaSyB16sGmIekuGIvYOfNoW9T44377IU2d2Es',
         v: '3.17',
         libraries: 'places'
+

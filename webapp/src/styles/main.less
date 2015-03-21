@@ -1,7 +1,10 @@
 ﻿@import "../../bower_components/bootstrap/less/bootstrap";
 @import "../../bower_components/toastr/toastr";
-@import "../../bower_components/font-awesome/less/font-awesome"; 
 @import "font-awesome/css/font-awesome.min.css";
+@import "angular-bootstrap-datetimepicker/src/css/datetimepicker.css";
+
+// Load Bootstrap fonts from this directory.
+@icon-font-path: "bootstrap/fonts/";
 
 body {
   padding-top: 70px;
@@ -18,6 +21,10 @@ a {
 
 .table-cats {
     min-width: 470px
+}
+
+a.accordion-toggle {
+    text-decoration: none;
 }
 
 .choose-location {

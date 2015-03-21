@@ -9,6 +9,7 @@ angular.module 'nuca', [
     'toastr'
     'ui.utils'
     'uiGmapgoogle-maps'
+    'ui.bootstrap.datetimepicker'
     #'facebook'
     'nuca.config'
     'nuca.constants'

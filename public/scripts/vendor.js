@@ -8893,9 +8893,21 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             return this.localeData().ordinal(func.call(this, a), period);
         };
     }
+    function monthDiff(a, b) {
+        var anchor2, adjust, wholeMonthDiff = 12 * (b.year() - a.year()) + (b.month() - a.month()), anchor = a.clone().add(wholeMonthDiff, "months");
+        return 0 > b - anchor ? (anchor2 = a.clone().add(wholeMonthDiff - 1, "months"), 
+        adjust = (b - anchor) / (anchor - anchor2)) : (anchor2 = a.clone().add(wholeMonthDiff + 1, "months"), 
+        adjust = (b - anchor) / (anchor2 - anchor)), -(wholeMonthDiff + adjust);
+    }
+    function meridiemFixWrap(locale, hour, meridiem) {
+        var isPm;
+        return null == meridiem ? hour : null != locale.meridiemHour ? locale.meridiemHour(hour, meridiem) : null != locale.isPM ? (isPm = locale.isPM(meridiem), 
+        isPm && 12 > hour && (hour += 12), isPm || 12 !== hour || (hour = 0), hour) : hour;
+    }
     function Locale() {}
     function Moment(config, skipOverflow) {
-        skipOverflow !== !1 && checkOverflow(config), copyConfig(this, config), this._d = new Date(+config._d);
+        skipOverflow !== !1 && checkOverflow(config), copyConfig(this, config), this._d = new Date(+config._d), 
+        updateInProgress === !1 && (updateInProgress = !0, moment.updateOffset(this), updateInProgress = !1);
     }
     function Duration(duration) {
         var normalizedInput = normalizeObjectUnits(duration), years = normalizedInput.year || 0, quarters = normalizedInput.quarter || 0, months = normalizedInput.month || 0, weeks = normalizedInput.week || 0, days = normalizedInput.day || 0, hours = normalizedInput.hour || 0, minutes = normalizedInput.minute || 0, seconds = normalizedInput.second || 0, milliseconds = normalizedInput.millisecond || 0;
@@ -9172,10 +9184,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             return a = new RegExp(regexpEscape(unescapeFormat(token.replace("\\", "")), "i"));
         }
     }
-    function timezoneMinutesFromString(string) {
+    function utcOffsetFromString(string) {
         string = string || "";
         var possibleTzMatches = string.match(parseTokenTimezone) || [], tzChunk = possibleTzMatches[possibleTzMatches.length - 1] || [], parts = (tzChunk + "").match(parseTimezoneChunker) || [ "-", 0, 0 ], minutes = +(60 * parts[1]) + toInt(parts[2]);
-        return "+" === parts[0] ? -minutes : minutes;
+        return "+" === parts[0] ? minutes : -minutes;
     }
     function addTimeToArrayFromToken(token, input, config) {
         var a, datePartArray = config._a;
@@ -9220,7 +9232,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
 
           case "a":
           case "A":
-            config._isPm = config._locale.isPM(input);
+            config._meridiem = input;
             break;
 
           case "h":
@@ -9259,7 +9271,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
 
           case "Z":
           case "ZZ":
-            config._useUTC = !0, config._tzm = timezoneMinutesFromString(input);
+            config._useUTC = !0, config._tzm = utcOffsetFromString(input);
             break;
 
           case "dd":
@@ -9308,7 +9320,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             for (;7 > i; i++) config._a[i] = input[i] = null == config._a[i] ? 2 === i ? 1 : 0 : config._a[i];
             24 === config._a[HOUR] && 0 === config._a[MINUTE] && 0 === config._a[SECOND] && 0 === config._a[MILLISECOND] && (config._nextDay = !0, 
             config._a[HOUR] = 0), config._d = (config._useUTC ? makeUTCDate : makeDate).apply(null, input), 
-            null != config._tzm && config._d.setUTCMinutes(config._d.getUTCMinutes() + config._tzm), 
+            null != config._tzm && config._d.setUTCMinutes(config._d.getUTCMinutes() - config._tzm), 
             config._nextDay && (config._a[HOUR] = 24);
         }
     }
@@ -9333,7 +9345,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
         addTimeToArrayFromToken(token, parsedInput, config)) : config._strict && !parsedInput && config._pf.unusedTokens.push(token);
         config._pf.charsLeftOver = stringLength - totalParsedInputLength, string.length > 0 && config._pf.unusedInput.push(string), 
         config._pf.bigHour === !0 && config._a[HOUR] <= 12 && (config._pf.bigHour = undefined), 
-        config._isPm && config._a[HOUR] < 12 && (config._a[HOUR] += 12), config._isPm === !1 && 12 === config._a[HOUR] && (config._a[HOUR] = 0), 
+        config._a[HOUR] = meridiemFixWrap(config._locale, config._a[HOUR], config._meridiem), 
         dateFromConfig(config), checkOverflow(config);
     }
     function unescapeFormat(s) {
@@ -9469,7 +9481,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
     function makeGlobal(shouldDeprecate) {
         "undefined" == typeof ender && (oldGlobalMoment = globalScope.moment, globalScope.moment = shouldDeprecate ? deprecate("Accessing Moment through the global scope is deprecated, and will be removed in an upcoming release.", moment) : moment);
     }
-    for (var moment, oldGlobalMoment, i, VERSION = "2.8.4", globalScope = "undefined" != typeof global ? global : this, round = Math.round, hasOwnProperty = Object.prototype.hasOwnProperty, YEAR = 0, MONTH = 1, DATE = 2, HOUR = 3, MINUTE = 4, SECOND = 5, MILLISECOND = 6, locales = {}, momentProperties = [], hasModule = "undefined" != typeof module && module && module.exports, aspNetJsonRegex = /^\/?Date\((\-?\d+)/i, aspNetTimeSpanJsonRegex = /(\-)?(?:(\d*)\.)?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?)?/, isoDurationRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/, formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|x|X|zz?|ZZ?|.)/g, localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g, parseTokenOneOrTwoDigits = /\d\d?/, parseTokenOneToThreeDigits = /\d{1,3}/, parseTokenOneToFourDigits = /\d{1,4}/, parseTokenOneToSixDigits = /[+\-]?\d{1,6}/, parseTokenDigits = /\d+/, parseTokenWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i, parseTokenTimezone = /Z|[\+\-]\d\d:?\d\d/gi, parseTokenT = /T/i, parseTokenOffsetMs = /[\+\-]?\d+/, parseTokenTimestampMs = /[\+\-]?\d+(\.\d{1,3})?/, parseTokenOneDigit = /\d/, parseTokenTwoDigits = /\d\d/, parseTokenThreeDigits = /\d{3}/, parseTokenFourDigits = /\d{4}/, parseTokenSixDigits = /[+-]?\d{6}/, parseTokenSignedNumber = /[+-]?\d+/, isoRegex = /^\s*(?:[+-]\d{6}|\d{4})-(?:(\d\d-\d\d)|(W\d\d$)|(W\d\d-\d)|(\d\d\d))((T| )(\d\d(:\d\d(:\d\d(\.\d+)?)?)?)?([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/, isoFormat = "YYYY-MM-DDTHH:mm:ssZ", isoDates = [ [ "YYYYYY-MM-DD", /[+-]\d{6}-\d{2}-\d{2}/ ], [ "YYYY-MM-DD", /\d{4}-\d{2}-\d{2}/ ], [ "GGGG-[W]WW-E", /\d{4}-W\d{2}-\d/ ], [ "GGGG-[W]WW", /\d{4}-W\d{2}/ ], [ "YYYY-DDD", /\d{4}-\d{3}/ ] ], isoTimes = [ [ "HH:mm:ss.SSSS", /(T| )\d\d:\d\d:\d\d\.\d+/ ], [ "HH:mm:ss", /(T| )\d\d:\d\d:\d\d/ ], [ "HH:mm", /(T| )\d\d:\d\d/ ], [ "HH", /(T| )\d\d/ ] ], parseTimezoneChunker = /([\+\-]|\d\d)/gi, unitMillisecondFactors = ("Date|Hours|Minutes|Seconds|Milliseconds".split("|"), 
+    for (var moment, oldGlobalMoment, i, VERSION = "2.9.0", globalScope = "undefined" == typeof global || "undefined" != typeof window && window !== global.window ? this : global, round = Math.round, hasOwnProperty = Object.prototype.hasOwnProperty, YEAR = 0, MONTH = 1, DATE = 2, HOUR = 3, MINUTE = 4, SECOND = 5, MILLISECOND = 6, locales = {}, momentProperties = [], hasModule = "undefined" != typeof module && module && module.exports, aspNetJsonRegex = /^\/?Date\((\-?\d+)/i, aspNetTimeSpanJsonRegex = /(\-)?(?:(\d*)\.)?(\d+)\:(\d+)(?:\:(\d+)\.?(\d{3})?)?/, isoDurationRegex = /^(-)?P(?:(?:([0-9,.]*)Y)?(?:([0-9,.]*)M)?(?:([0-9,.]*)D)?(?:T(?:([0-9,.]*)H)?(?:([0-9,.]*)M)?(?:([0-9,.]*)S)?)?|([0-9,.]*)W)$/, formattingTokens = /(\[[^\[]*\])|(\\)?(Mo|MM?M?M?|Do|DDDo|DD?D?D?|ddd?d?|do?|w[o|w]?|W[o|W]?|Q|YYYYYY|YYYYY|YYYY|YY|gg(ggg?)?|GG(GGG?)?|e|E|a|A|hh?|HH?|mm?|ss?|S{1,4}|x|X|zz?|ZZ?|.)/g, localFormattingTokens = /(\[[^\[]*\])|(\\)?(LTS|LT|LL?L?L?|l{1,4})/g, parseTokenOneOrTwoDigits = /\d\d?/, parseTokenOneToThreeDigits = /\d{1,3}/, parseTokenOneToFourDigits = /\d{1,4}/, parseTokenOneToSixDigits = /[+\-]?\d{1,6}/, parseTokenDigits = /\d+/, parseTokenWord = /[0-9]*['a-z\u00A0-\u05FF\u0700-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]+|[\u0600-\u06FF\/]+(\s*?[\u0600-\u06FF]+){1,2}/i, parseTokenTimezone = /Z|[\+\-]\d\d:?\d\d/gi, parseTokenT = /T/i, parseTokenOffsetMs = /[\+\-]?\d+/, parseTokenTimestampMs = /[\+\-]?\d+(\.\d{1,3})?/, parseTokenOneDigit = /\d/, parseTokenTwoDigits = /\d\d/, parseTokenThreeDigits = /\d{3}/, parseTokenFourDigits = /\d{4}/, parseTokenSixDigits = /[+-]?\d{6}/, parseTokenSignedNumber = /[+-]?\d+/, isoRegex = /^\s*(?:[+-]\d{6}|\d{4})-(?:(\d\d-\d\d)|(W\d\d$)|(W\d\d-\d)|(\d\d\d))((T| )(\d\d(:\d\d(:\d\d(\.\d+)?)?)?)?([\+\-]\d\d(?::?\d\d)?|\s*Z)?)?$/, isoFormat = "YYYY-MM-DDTHH:mm:ssZ", isoDates = [ [ "YYYYYY-MM-DD", /[+-]\d{6}-\d{2}-\d{2}/ ], [ "YYYY-MM-DD", /\d{4}-\d{2}-\d{2}/ ], [ "GGGG-[W]WW-E", /\d{4}-W\d{2}-\d/ ], [ "GGGG-[W]WW", /\d{4}-W\d{2}/ ], [ "YYYY-DDD", /\d{4}-\d{3}/ ] ], isoTimes = [ [ "HH:mm:ss.SSSS", /(T| )\d\d:\d\d:\d\d\.\d+/ ], [ "HH:mm:ss", /(T| )\d\d:\d\d:\d\d/ ], [ "HH:mm", /(T| )\d\d:\d\d/ ], [ "HH", /(T| )\d\d/ ] ], parseTimezoneChunker = /([\+\-]|\d\d)/gi, unitMillisecondFactors = ("Date|Hours|Minutes|Seconds|Milliseconds".split("|"), 
     {
         Milliseconds: 1,
         Seconds: 1e3,
@@ -9609,11 +9621,11 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             return leftZeroFill(this.milliseconds(), 3);
         },
         Z: function() {
-            var a = -this.zone(), b = "+";
+            var a = this.utcOffset(), b = "+";
             return 0 > a && (a = -a, b = "-"), b + leftZeroFill(toInt(a / 60), 2) + ":" + leftZeroFill(toInt(a) % 60, 2);
         },
         ZZ: function() {
-            var a = -this.zone(), b = "+";
+            var a = this.utcOffset(), b = "+";
             return 0 > a && (a = -a, b = "-"), b + leftZeroFill(toInt(a / 60), 2) + leftZeroFill(toInt(a) % 60, 2);
         },
         z: function() {
@@ -9631,7 +9643,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
         Q: function() {
             return this.quarter();
         }
-    }, deprecations = {}, lists = [ "months", "monthsShort", "weekdays", "weekdaysShort", "weekdaysMin" ]; ordinalizeTokens.length; ) i = ordinalizeTokens.pop(), 
+    }, deprecations = {}, lists = [ "months", "monthsShort", "weekdays", "weekdaysShort", "weekdaysMin" ], updateInProgress = !1; ordinalizeTokens.length; ) i = ordinalizeTokens.pop(), 
     formatTokenFunctions[i + "o"] = ordinalizeToken(formatTokenFunctions[i], i);
     for (;paddedTokens.length; ) i = paddedTokens.pop(), formatTokenFunctions[i + i] = padToken(formatTokenFunctions[i], 2);
     formatTokenFunctions.DDDD = padToken(formatTokenFunctions.DDD, 3), extend(Locale.prototype, {
@@ -9752,6 +9764,12 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             dow: 0,
             doy: 6
         },
+        firstDayOfWeek: function() {
+            return this._week.dow;
+        },
+        firstDayOfYear: function() {
+            return this._week.doy;
+        },
         _invalidDate: "Invalid date",
         invalidDate: function() {
             return this._invalidDate;
@@ -9802,7 +9820,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             m: parseIso(match[6]),
             s: parseIso(match[7]),
             w: parseIso(match[8])
-        }) : "object" == typeof duration && ("from" in duration || "to" in duration) && (diffRes = momentsDifference(moment(duration.from), moment(duration.to)), 
+        }) : null == duration ? duration = {} : "object" == typeof duration && ("from" in duration || "to" in duration) && (diffRes = momentsDifference(moment(duration.from), moment(duration.to)), 
         duration = {}, duration.ms = diffRes.milliseconds, duration.M = diffRes.months), 
         ret = new Duration(duration), moment.isDuration(input) && hasOwnProp(input, "_locale") && (ret._locale = input._locale), 
         ret;
@@ -9846,12 +9864,12 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
         return moment.apply(null, arguments).parseZone();
     }, moment.parseTwoDigitYear = function(input) {
         return toInt(input) + (toInt(input) > 68 ? 1900 : 2e3);
-    }, extend(moment.fn = Moment.prototype, {
+    }, moment.isDate = isDate, extend(moment.fn = Moment.prototype, {
         clone: function() {
             return moment(this);
         },
         valueOf: function() {
-            return +this._d + 6e4 * (this._offset || 0);
+            return +this._d - 6e4 * (this._offset || 0);
         },
         unix: function() {
             return Math.floor(+this / 1e3);
@@ -9883,10 +9901,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             return this._pf.overflow;
         },
         utc: function(keepLocalTime) {
-            return this.zone(0, keepLocalTime);
+            return this.utcOffset(0, keepLocalTime);
         },
         local: function(keepLocalTime) {
-            return this._isUTC && (this.zone(0, keepLocalTime), this._isUTC = !1, keepLocalTime && this.add(this._dateTzOffset(), "m")), 
+            return this._isUTC && (this.utcOffset(0, keepLocalTime), this._isUTC = !1, keepLocalTime && this.subtract(this._dateUtcOffset(), "m")), 
             this;
         },
         format: function(inputString) {
@@ -9896,11 +9914,9 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
         add: createAdder(1, "add"),
         subtract: createAdder(-1, "subtract"),
         diff: function(input, units, asFloat) {
-            var diff, output, daysAdjust, that = makeAs(input, this), zoneDiff = 6e4 * (this.zone() - that.zone());
-            return units = normalizeUnits(units), "year" === units || "month" === units ? (diff = 432e5 * (this.daysInMonth() + that.daysInMonth()), 
-            output = 12 * (this.year() - that.year()) + (this.month() - that.month()), daysAdjust = this - moment(this).startOf("month") - (that - moment(that).startOf("month")), 
-            daysAdjust -= 6e4 * (this.zone() - moment(this).startOf("month").zone() - (that.zone() - moment(that).startOf("month").zone())), 
-            output += daysAdjust / diff, "year" === units && (output /= 12)) : (diff = this - that, 
+            var diff, output, that = makeAs(input, this), zoneDiff = 6e4 * (that.utcOffset() - this.utcOffset());
+            return units = normalizeUnits(units), "year" === units || "month" === units || "quarter" === units ? (output = monthDiff(this, that), 
+            "quarter" === units ? output /= 3 : "year" === units && (output /= 12)) : (diff = this - that, 
             output = "second" === units ? diff / 1e3 : "minute" === units ? diff / 6e4 : "hour" === units ? diff / 36e5 : "day" === units ? (diff - zoneDiff) / 864e5 : "week" === units ? (diff - zoneDiff) / 6048e5 : diff), 
             asFloat ? output : absRound(output);
         },
@@ -9921,7 +9937,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             return isLeapYear(this.year());
         },
         isDST: function() {
-            return this.zone() < this.clone().month(0).zone() || this.zone() < this.clone().month(5).zone();
+            return this.utcOffset() > this.clone().month(0).utcOffset() || this.utcOffset() > this.clone().month(5).utcOffset();
         },
         day: function(input) {
             var day = this._isUTC ? this._d.getUTCDay() : this._d.getDay();
@@ -9969,6 +9985,9 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             "millisecond" === units ? (input = moment.isMoment(input) ? input : moment(input), 
             +input > +this) : (inputMs = moment.isMoment(input) ? +input : +moment(input), +this.clone().endOf(units) < inputMs);
         },
+        isBetween: function(from, to, units) {
+            return this.isAfter(from, units) && this.isBefore(to, units);
+        },
         isSame: function(input, units) {
             var inputMs;
             return units = normalizeUnits(units || "millisecond"), "millisecond" === units ? (input = moment.isMoment(input) ? input : moment(input), 
@@ -9980,13 +9999,26 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
         max: deprecate("moment().max is deprecated, use moment.max instead. https://github.com/moment/moment/issues/1548", function(other) {
             return other = moment.apply(null, arguments), other > this ? this : other;
         }),
-        zone: function(input, keepLocalTime) {
+        zone: deprecate("moment().zone is deprecated, use moment().utcOffset instead. https://github.com/moment/moment/issues/1779", function(input, keepLocalTime) {
+            return null != input ? ("string" != typeof input && (input = -input), this.utcOffset(input, keepLocalTime), 
+            this) : -this.utcOffset();
+        }),
+        utcOffset: function(input, keepLocalTime) {
             var localAdjust, offset = this._offset || 0;
-            return null == input ? this._isUTC ? offset : this._dateTzOffset() : ("string" == typeof input && (input = timezoneMinutesFromString(input)), 
-            Math.abs(input) < 16 && (input = 60 * input), !this._isUTC && keepLocalTime && (localAdjust = this._dateTzOffset()), 
-            this._offset = input, this._isUTC = !0, null != localAdjust && this.subtract(localAdjust, "m"), 
-            offset !== input && (!keepLocalTime || this._changeInProgress ? addOrSubtractDurationFromMoment(this, moment.duration(offset - input, "m"), 1, !1) : this._changeInProgress || (this._changeInProgress = !0, 
-            moment.updateOffset(this, !0), this._changeInProgress = null)), this);
+            return null != input ? ("string" == typeof input && (input = utcOffsetFromString(input)), 
+            Math.abs(input) < 16 && (input = 60 * input), !this._isUTC && keepLocalTime && (localAdjust = this._dateUtcOffset()), 
+            this._offset = input, this._isUTC = !0, null != localAdjust && this.add(localAdjust, "m"), 
+            offset !== input && (!keepLocalTime || this._changeInProgress ? addOrSubtractDurationFromMoment(this, moment.duration(input - offset, "m"), 1, !1) : this._changeInProgress || (this._changeInProgress = !0, 
+            moment.updateOffset(this, !0), this._changeInProgress = null)), this) : this._isUTC ? offset : this._dateUtcOffset();
+        },
+        isLocal: function() {
+            return !this._isUTC;
+        },
+        isUtcOffset: function() {
+            return this._isUTC;
+        },
+        isUtc: function() {
+            return this._isUTC && 0 === this._offset;
         },
         zoneAbbr: function() {
             return this._isUTC ? "UTC" : "";
@@ -9995,11 +10027,11 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             return this._isUTC ? "Coordinated Universal Time" : "";
         },
         parseZone: function() {
-            return this._tzm ? this.zone(this._tzm) : "string" == typeof this._i && this.zone(this._i), 
+            return this._tzm ? this.utcOffset(this._tzm) : "string" == typeof this._i && this.utcOffset(utcOffsetFromString(this._i)), 
             this;
         },
         hasAlignedHourOffset: function(input) {
-            return input = input ? moment(input).zone() : 0, (this.zone() - input) % 60 === 0;
+            return input = input ? moment(input).utcOffset() : 0, (this.utcOffset() - input) % 60 === 0;
         },
         daysInMonth: function() {
             return daysInMonth(this.year(), this.month());
@@ -10045,8 +10077,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             return units = normalizeUnits(units), this[units]();
         },
         set: function(units, value) {
-            return units = normalizeUnits(units), "function" == typeof this[units] && this[units](value), 
-            this;
+            var unit;
+            if ("object" == typeof units) for (unit in units) this.set(unit, units[unit]); else units = normalizeUnits(units), 
+            "function" == typeof this[units] && this[units](value);
+            return this;
         },
         locale: function(key) {
             var newLocaleData;
@@ -10059,8 +10093,8 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
         localeData: function() {
             return this._locale;
         },
-        _dateTzOffset: function() {
-            return 15 * Math.round(this._d.getTimezoneOffset() / 15);
+        _dateUtcOffset: function() {
+            return 15 * -Math.round(this._d.getTimezoneOffset() / 15);
         }
     }), moment.fn.millisecond = moment.fn.milliseconds = makeAccessor("Milliseconds", !1), 
     moment.fn.second = moment.fn.seconds = makeAccessor("Seconds", !1), moment.fn.minute = moment.fn.minutes = makeAccessor("Minutes", !1), 
@@ -10069,7 +10103,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
     moment.fn.year = makeAccessor("FullYear", !0), moment.fn.years = deprecate("years accessor is deprecated. Use year instead.", makeAccessor("FullYear", !0)), 
     moment.fn.days = moment.fn.day, moment.fn.months = moment.fn.month, moment.fn.weeks = moment.fn.week, 
     moment.fn.isoWeeks = moment.fn.isoWeek, moment.fn.quarters = moment.fn.quarter, 
-    moment.fn.toJSON = moment.fn.toISOString, extend(moment.duration.fn = Duration.prototype, {
+    moment.fn.toJSON = moment.fn.toISOString, moment.fn.isUTC = moment.fn.isUtc, extend(moment.duration.fn = Duration.prototype, {
         _bubble: function() {
             var seconds, minutes, hours, milliseconds = this._milliseconds, days = this._days, months = this._months, data = this._data, years = 0;
             data.milliseconds = milliseconds % 1e3, seconds = absRound(milliseconds / 1e3), 
@@ -10147,6 +10181,9 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
         },
         localeData: function() {
             return this._locale;
+        },
+        toJSON: function() {
+            return this.toISOString();
         }
     }), moment.duration.fn.toString = moment.duration.fn.toISOString;
     for (i in unitMillisecondFactors) hasOwnProp(unitMillisecondFactors, i) && makeDurationGetter(i.toLowerCase());
@@ -10181,6 +10218,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             weekdays: "Sondag_Maandag_Dinsdag_Woensdag_Donderdag_Vrydag_Saterdag".split("_"),
             weekdaysShort: "Son_Maa_Din_Woe_Don_Vry_Sat".split("_"),
             weekdaysMin: "So_Ma_Di_Wo_Do_Vr_Sa".split("_"),
+            meridiemParse: /vm|nm/i,
+            isPM: function(input) {
+                return /^nm$/i.test(input);
+            },
             meridiem: function(hours, minutes, isLower) {
                 return 12 > hours ? isLower ? "vm" : "VM" : isLower ? "nm" : "NM";
             },
@@ -10309,6 +10350,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LLL: "D MMMM YYYY LT",
                 LLLL: "dddd D MMMM YYYY LT"
             },
+            meridiemParse: /ص|م/,
+            isPM: function(input) {
+                return "م" === input;
+            },
             meridiem: function(hour) {
                 return 12 > hour ? "ص" : "م";
             },
@@ -10348,6 +10393,51 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             week: {
                 dow: 6,
                 doy: 12
+            }
+        });
+    }), function(factory) {
+        factory(moment);
+    }(function(moment) {
+        return moment.defineLocale("ar-tn", {
+            months: "جانفي_فيفري_مارس_أفريل_ماي_جوان_جويلية_أوت_سبتمبر_أكتوبر_نوفمبر_ديسمبر".split("_"),
+            monthsShort: "جانفي_فيفري_مارس_أفريل_ماي_جوان_جويلية_أوت_سبتمبر_أكتوبر_نوفمبر_ديسمبر".split("_"),
+            weekdays: "الأحد_الإثنين_الثلاثاء_الأربعاء_الخميس_الجمعة_السبت".split("_"),
+            weekdaysShort: "أحد_إثنين_ثلاثاء_أربعاء_خميس_جمعة_سبت".split("_"),
+            weekdaysMin: "ح_ن_ث_ر_خ_ج_س".split("_"),
+            longDateFormat: {
+                LT: "HH:mm",
+                LTS: "LT:ss",
+                L: "DD/MM/YYYY",
+                LL: "D MMMM YYYY",
+                LLL: "D MMMM YYYY LT",
+                LLLL: "dddd D MMMM YYYY LT"
+            },
+            calendar: {
+                sameDay: "[اليوم على الساعة] LT",
+                nextDay: "[غدا على الساعة] LT",
+                nextWeek: "dddd [على الساعة] LT",
+                lastDay: "[أمس على الساعة] LT",
+                lastWeek: "dddd [على الساعة] LT",
+                sameElse: "L"
+            },
+            relativeTime: {
+                future: "في %s",
+                past: "منذ %s",
+                s: "ثوان",
+                m: "دقيقة",
+                mm: "%d دقائق",
+                h: "ساعة",
+                hh: "%d ساعات",
+                d: "يوم",
+                dd: "%d أيام",
+                M: "شهر",
+                MM: "%d أشهر",
+                y: "سنة",
+                yy: "%d سنوات"
+            },
+            week: {
+                dow: 1,
+                doy: 4
             }
         });
     }), function(factory) {
@@ -10403,6 +10493,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LL: "D MMMM YYYY",
                 LLL: "D MMMM YYYY LT",
                 LLLL: "dddd D MMMM YYYY LT"
+            },
+            meridiemParse: /ص|م/,
+            isPM: function(input) {
+                return "م" === input;
             },
             meridiem: function(hour) {
                 return 12 > hour ? "ص" : "م";
@@ -10505,6 +10599,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 y: "bir il",
                 yy: "%d il"
             },
+            meridiemParse: /gecə|səhər|gündüz|axşam/,
+            isPM: function(input) {
+                return /^(gündüz|axşam)$/.test(input);
+            },
             meridiem: function(hour) {
                 return 4 > hour ? "gecə" : 12 > hour ? "səhər" : 17 > hour ? "gündüz" : "axşam";
             },
@@ -10601,6 +10699,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 MM: relativeTimeWithPlural,
                 y: "год",
                 yy: relativeTimeWithPlural
+            },
+            meridiemParse: /ночы|раніцы|дня|вечара/,
+            isPM: function(input) {
+                return /^(дня|вечара)$/.test(input);
             },
             meridiem: function(hour) {
                 return 4 > hour ? "ночы" : 12 > hour ? "раніцы" : 17 > hour ? "дня" : "вечара";
@@ -10763,6 +10865,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                     return symbolMap[match];
                 });
             },
+            meridiemParse: /রাত|শকাল|দুপুর|বিকেল|রাত/,
+            isPM: function(input) {
+                return /^(দুপুর|বিকেল|রাত)$/.test(input);
+            },
             meridiem: function(hour) {
                 return 4 > hour ? "রাত" : 10 > hour ? "শকাল" : 17 > hour ? "দুপুর" : 20 > hour ? "বিকেল" : "রাত";
             },
@@ -10843,6 +10949,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 return string.replace(/\d/g, function(match) {
                     return symbolMap[match];
                 });
+            },
+            meridiemParse: /མཚན་མོ|ཞོགས་ཀས|ཉིན་གུང|དགོང་དག|མཚན་མོ/,
+            isPM: function(input) {
+                return /^(ཉིན་གུང|དགོང་དག|མཚན་མོ)$/.test(input);
             },
             meridiem: function(hour) {
                 return 4 > hour ? "མཚན་མོ" : 10 > hour ? "ཞོགས་ཀས" : 17 > hour ? "ཉིན་གུང" : 20 > hour ? "དགོང་དག" : "མཚན་མོ";
@@ -11735,6 +11845,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LLL: "D[-an de] MMMM, YYYY LT",
                 LLLL: "dddd, [la] D[-an de] MMMM, YYYY LT"
             },
+            meridiemParse: /[ap]\.t\.m/i,
+            isPM: function(input) {
+                return "p" === input.charAt(0).toLowerCase();
+            },
             meridiem: function(hours, minutes, isLower) {
                 return hours > 11 ? isLower ? "p.t.m." : "P.T.M." : isLower ? "a.t.m." : "A.T.M.";
             },
@@ -11980,6 +12094,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LL: "D MMMM YYYY",
                 LLL: "D MMMM YYYY LT",
                 LLLL: "dddd, D MMMM YYYY LT"
+            },
+            meridiemParse: /قبل از ظهر|بعد از ظهر/,
+            isPM: function(input) {
+                return /بعد از ظهر/.test(input);
             },
             meridiem: function(hour) {
                 return 12 > hour ? "قبل از ظهر" : "بعد از ظهر";
@@ -12265,6 +12383,58 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
     }), function(factory) {
         factory(moment);
     }(function(moment) {
+        var monthsShortWithDots = "jan._feb._mrt._apr._mai_jun._jul._aug._sep._okt._nov._des.".split("_"), monthsShortWithoutDots = "jan_feb_mrt_apr_mai_jun_jul_aug_sep_okt_nov_des".split("_");
+        return moment.defineLocale("fy", {
+            months: "jannewaris_febrewaris_maart_april_maaie_juny_july_augustus_septimber_oktober_novimber_desimber".split("_"),
+            monthsShort: function(m, format) {
+                return /-MMM-/.test(format) ? monthsShortWithoutDots[m.month()] : monthsShortWithDots[m.month()];
+            },
+            weekdays: "snein_moandei_tiisdei_woansdei_tongersdei_freed_sneon".split("_"),
+            weekdaysShort: "si._mo._ti._wo._to._fr._so.".split("_"),
+            weekdaysMin: "Si_Mo_Ti_Wo_To_Fr_So".split("_"),
+            longDateFormat: {
+                LT: "HH:mm",
+                LTS: "LT:ss",
+                L: "DD-MM-YYYY",
+                LL: "D MMMM YYYY",
+                LLL: "D MMMM YYYY LT",
+                LLLL: "dddd D MMMM YYYY LT"
+            },
+            calendar: {
+                sameDay: "[hjoed om] LT",
+                nextDay: "[moarn om] LT",
+                nextWeek: "dddd [om] LT",
+                lastDay: "[juster om] LT",
+                lastWeek: "[ôfrûne] dddd [om] LT",
+                sameElse: "L"
+            },
+            relativeTime: {
+                future: "oer %s",
+                past: "%s lyn",
+                s: "in pear sekonden",
+                m: "ien minút",
+                mm: "%d minuten",
+                h: "ien oere",
+                hh: "%d oeren",
+                d: "ien dei",
+                dd: "%d dagen",
+                M: "ien moanne",
+                MM: "%d moannen",
+                y: "ien jier",
+                yy: "%d jierren"
+            },
+            ordinalParse: /\d{1,2}(ste|de)/,
+            ordinal: function(number) {
+                return number + (1 === number || 8 === number || number >= 20 ? "ste" : "de");
+            },
+            week: {
+                dow: 1,
+                doy: 4
+            }
+        });
+    }), function(factory) {
+        factory(moment);
+    }(function(moment) {
         return moment.defineLocale("gl", {
             months: "Xaneiro_Febreiro_Marzo_Abril_Maio_Xuño_Xullo_Agosto_Setembro_Outubro_Novembro_Decembro".split("_"),
             monthsShort: "Xan._Feb._Mar._Abr._Mai._Xuñ._Xul._Ago._Set._Out._Nov._Dec.".split("_"),
@@ -12370,7 +12540,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 },
                 y: "שנה",
                 yy: function(number) {
-                    return 2 === number ? "שנתיים" : number + " שנים";
+                    return 2 === number ? "שנתיים" : number % 10 === 0 && 10 !== number ? number + " שנה" : number + " שנים";
                 }
             }
         });
@@ -12446,6 +12616,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 return string.replace(/\d/g, function(match) {
                     return symbolMap[match];
                 });
+            },
+            meridiemParse: /रात|सुबह|दोपहर|शाम/,
+            meridiemHour: function(hour, meridiem) {
+                return 12 === hour && (hour = 0), "रात" === meridiem ? 4 > hour ? hour : hour + 12 : "सुबह" === meridiem ? hour : "दोपहर" === meridiem ? hour >= 10 ? hour : hour + 12 : "शाम" === meridiem ? hour + 12 : void 0;
             },
             meridiem: function(hour) {
                 return 4 > hour ? "रात" : 10 > hour ? "सुबह" : 17 > hour ? "दोपहर" : 20 > hour ? "शाम" : "रात";
@@ -12618,6 +12792,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LLL: "YYYY. MMMM D., LT",
                 LLLL: "YYYY. MMMM D., dddd LT"
             },
+            meridiemParse: /de|du/i,
+            isPM: function(input) {
+                return "u" === input.charAt(1).toLowerCase();
+            },
             meridiem: function(hours, minutes, isLower) {
                 return 12 > hours ? isLower === !0 ? "de" : "DE" : isLower === !0 ? "du" : "DU";
             },
@@ -12714,6 +12892,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 y: "տարի",
                 yy: "%d տարի"
             },
+            meridiemParse: /գիշերվա|առավոտվա|ցերեկվա|երեկոյան/,
+            isPM: function(input) {
+                return /^(ցերեկվա|երեկոյան)$/.test(input);
+            },
             meridiem: function(hour) {
                 return 4 > hour ? "գիշերվա" : 12 > hour ? "առավոտվա" : 17 > hour ? "ցերեկվա" : "երեկոյան";
             },
@@ -12751,6 +12933,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LL: "D MMMM YYYY",
                 LLL: "D MMMM YYYY [pukul] LT",
                 LLLL: "dddd, D MMMM YYYY [pukul] LT"
+            },
+            meridiemParse: /pagi|siang|sore|malam/,
+            meridiemHour: function(hour, meridiem) {
+                return 12 === hour && (hour = 0), "pagi" === meridiem ? hour : "siang" === meridiem ? hour >= 11 ? hour : hour + 12 : "sore" === meridiem || "malam" === meridiem ? hour + 12 : void 0;
             },
             meridiem: function(hours) {
                 return 11 > hours ? "pagi" : 15 > hours ? "siang" : 19 > hours ? "sore" : "malam";
@@ -12941,6 +13127,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LLL: "YYYY年M月D日LT",
                 LLLL: "YYYY年M月D日LT dddd"
             },
+            meridiemParse: /午前|午後/i,
+            isPM: function(input) {
+                return "午後" === input;
+            },
             meridiem: function(hour) {
                 return 12 > hour ? "午前" : "午後";
             },
@@ -13097,9 +13287,6 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LLL: "YYYY년 MMMM D일 LT",
                 LLLL: "YYYY년 MMMM D일 dddd LT"
             },
-            meridiem: function(hour) {
-                return 12 > hour ? "오전" : "오후";
-            },
             calendar: {
                 sameDay: "오늘 LT",
                 nextDay: "내일 LT",
@@ -13126,9 +13313,12 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             },
             ordinalParse: /\d{1,2}일/,
             ordinal: "%d일",
-            meridiemParse: /(오전|오후)/,
+            meridiemParse: /오전|오후/,
             isPM: function(token) {
                 return "오후" === token;
+            },
+            meridiem: function(hour) {
+                return 12 > hour ? "오전" : "오후";
             }
         });
     }), function(factory) {
@@ -13468,6 +13658,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 y: "ഒരു വർഷം",
                 yy: "%d വർഷം"
             },
+            meridiemParse: /രാത്രി|രാവിലെ|ഉച്ച കഴിഞ്ഞ്|വൈകുന്നേരം|രാത്രി/i,
+            isPM: function(input) {
+                return /^(ഉച്ച കഴിഞ്ഞ്|വൈകുന്നേരം|രാത്രി)$/.test(input);
+            },
             meridiem: function(hour) {
                 return 4 > hour ? "രാത്രി" : 12 > hour ? "രാവിലെ" : 17 > hour ? "ഉച്ച കഴിഞ്ഞ്" : 20 > hour ? "വൈകുന്നേരം" : "രാത്രി";
             }
@@ -13545,6 +13739,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                     return symbolMap[match];
                 });
             },
+            meridiemParse: /रात्री|सकाळी|दुपारी|सायंकाळी/,
+            meridiemHour: function(hour, meridiem) {
+                return 12 === hour && (hour = 0), "रात्री" === meridiem ? 4 > hour ? hour : hour + 12 : "सकाळी" === meridiem ? hour : "दुपारी" === meridiem ? hour >= 10 ? hour : hour + 12 : "सायंकाळी" === meridiem ? hour + 12 : void 0;
+            },
             meridiem: function(hour) {
                 return 4 > hour ? "रात्री" : 10 > hour ? "सकाळी" : 17 > hour ? "दुपारी" : 20 > hour ? "सायंकाळी" : "रात्री";
             },
@@ -13569,6 +13767,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LL: "D MMMM YYYY",
                 LLL: "D MMMM YYYY [pukul] LT",
                 LLLL: "dddd, D MMMM YYYY [pukul] LT"
+            },
+            meridiemParse: /pagi|tengahari|petang|malam/,
+            meridiemHour: function(hour, meridiem) {
+                return 12 === hour && (hour = 0), "pagi" === meridiem ? hour : "tengahari" === meridiem ? hour >= 11 ? hour : hour + 12 : "petang" === meridiem || "malam" === meridiem ? hour + 12 : void 0;
             },
             meridiem: function(hours) {
                 return 11 > hours ? "pagi" : 15 > hours ? "tengahari" : 19 > hours ? "petang" : "malam";
@@ -13775,6 +13977,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 return string.replace(/\d/g, function(match) {
                     return symbolMap[match];
                 });
+            },
+            meridiemParse: /राती|बिहान|दिउँसो|बेलुका|साँझ|राती/,
+            meridiemHour: function(hour, meridiem) {
+                return 12 === hour && (hour = 0), "राती" === meridiem ? 3 > hour ? hour : hour + 12 : "बिहान" === meridiem ? hour : "दिउँसो" === meridiem ? hour >= 10 ? hour : hour + 12 : "बेलुका" === meridiem || "साँझ" === meridiem ? hour + 12 : void 0;
             },
             meridiem: function(hour) {
                 return 3 > hour ? "राती" : 10 > hour ? "बिहान" : 15 > hour ? "दिउँसो" : 18 > hour ? "बेलुका" : 20 > hour ? "साँझ" : "राती";
@@ -14514,6 +14720,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             weekdays: "E Diel_E Hënë_E Martë_E Mërkurë_E Enjte_E Premte_E Shtunë".split("_"),
             weekdaysShort: "Die_Hën_Mar_Mër_Enj_Pre_Sht".split("_"),
             weekdaysMin: "D_H_Ma_Më_E_P_Sh".split("_"),
+            meridiemParse: /PD|MD/,
+            isPM: function(input) {
+                return "M" === input.charAt(0);
+            },
             meridiem: function(hours) {
                 return 12 > hours ? "PD" : "MD";
             },
@@ -14819,8 +15029,12 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
             ordinal: function(number) {
                 return number + "வது";
             },
+            meridiemParse: /யாமம்|வைகறை|காலை|நண்பகல்|எற்பாடு|மாலை/,
             meridiem: function(hour) {
-                return hour >= 6 && 10 >= hour ? " காலை" : hour >= 10 && 14 >= hour ? " நண்பகல்" : hour >= 14 && 18 >= hour ? " எற்பாடு" : hour >= 18 && 20 >= hour ? " மாலை" : hour >= 20 && 24 >= hour ? " இரவு" : hour >= 0 && 6 >= hour ? " வைகறை" : void 0;
+                return 2 > hour ? " யாமம்" : 6 > hour ? " வைகறை" : 10 > hour ? " காலை" : 14 > hour ? " நண்பகல்" : 18 > hour ? " எற்பாடு" : 22 > hour ? " மாலை" : " யாமம்";
+            },
+            meridiemHour: function(hour, meridiem) {
+                return 12 === hour && (hour = 0), "யாமம்" === meridiem ? 2 > hour ? hour : hour + 12 : "வைகறை" === meridiem || "காலை" === meridiem ? hour : "நண்பகல்" === meridiem && hour >= 10 ? hour : hour + 12;
             },
             week: {
                 dow: 0,
@@ -14843,6 +15057,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 LL: "D MMMM YYYY",
                 LLL: "D MMMM YYYY เวลา LT",
                 LLLL: "วันddddที่ D MMMM YYYY เวลา LT"
+            },
+            meridiemParse: /ก่อนเที่ยง|หลังเที่ยง/,
+            isPM: function(input) {
+                return "หลังเที่ยง" === input;
             },
             meridiem: function(hour) {
                 return 12 > hour ? "ก่อนเที่ยง" : "หลังเที่ยง";
@@ -15168,6 +15386,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 y: "рік",
                 yy: relativeTimeWithPlural
             },
+            meridiemParse: /ночі|ранку|дня|вечора/,
+            isPM: function(input) {
+                return /^(дня|вечора)$/.test(input);
+            },
             meridiem: function(hour) {
                 return 4 > hour ? "ночі" : 12 > hour ? "ранку" : 17 > hour ? "дня" : "вечора";
             },
@@ -15312,6 +15534,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 lll: "YYYY年MMMD日LT",
                 llll: "YYYY年MMMD日ddddLT"
             },
+            meridiemParse: /凌晨|早上|上午|中午|下午|晚上/,
+            meridiemHour: function(hour, meridiem) {
+                return 12 === hour && (hour = 0), "凌晨" === meridiem || "早上" === meridiem || "上午" === meridiem ? hour : "下午" === meridiem || "晚上" === meridiem ? hour + 12 : hour >= 11 ? hour : hour + 12;
+            },
             meridiem: function(hour, minute) {
                 var hm = 100 * hour + minute;
                 return 600 > hm ? "凌晨" : 900 > hm ? "早上" : 1130 > hm ? "上午" : 1230 > hm ? "中午" : 1800 > hm ? "下午" : "晚上";
@@ -15398,6 +15624,10 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 lll: "YYYY年MMMD日LT",
                 llll: "YYYY年MMMD日ddddLT"
             },
+            meridiemParse: /早上|上午|中午|下午|晚上/,
+            meridiemHour: function(hour, meridiem) {
+                return 12 === hour && (hour = 0), "早上" === meridiem || "上午" === meridiem ? hour : "中午" === meridiem ? hour >= 11 ? hour : hour + 12 : "下午" === meridiem || "晚上" === meridiem ? hour + 12 : void 0;
+            },
             meridiem: function(hour, minute) {
                 var hm = 100 * hour + minute;
                 return 900 > hm ? "早上" : 1130 > hm ? "上午" : 1230 > hm ? "中午" : 1800 > hm ? "下午" : "晚上";
@@ -15445,7 +15675,7 @@ angular.module("ui.bootstrap.transition", []).factory("$transition", [ "$q", "$t
                 yy: "%d年"
             }
         });
-    }), moment.locale("en"), hasModule ? module.exports = moment : "function" == typeof define && define.amd ? (define("moment", function(require, exports, module) {
+    }), moment.locale("en"), hasModule ? module.exports = moment : "function" == typeof define && define.amd ? (define(function(require, exports, module) {
         return module.config && module.config() && module.config().noGlobal === !0 && (globalScope.moment = oldGlobalMoment), 
         moment;
     }), makeGlobal(!0)) : makeGlobal();
@@ -23408,4 +23638,229 @@ function() {
             })
         };
     } ]);
-}(window, angular);
+}(window, angular), function(factory) {
+    "use strict";
+    "function" == typeof define && define.amd ? define([ "angular", "moment" ], factory) : "object" == typeof exports ? module.exports = factory(require("angular"), require("moment")) : factory(window.angular, window.moment);
+}(function(angular, moment) {
+    "use strict";
+    angular.module("ui.bootstrap.datetimepicker", []).constant("dateTimePickerConfig", {
+        dropdownSelector: null,
+        minuteStep: 5,
+        minView: "minute",
+        startView: "day"
+    }).directive("datetimepicker", [ "$log", "dateTimePickerConfig", function($log, defaultConfig) {
+        function DateObject() {
+            var tempDate = new Date(), localOffset = 6e4 * tempDate.getTimezoneOffset();
+            this.utcDateValue = tempDate.getTime(), this.selectable = !0, this.localDateValue = function() {
+                return this.utcDateValue + localOffset;
+            };
+            var validProperties = [ "utcDateValue", "localDateValue", "display", "active", "selectable", "past", "future" ];
+            for (var prop in arguments[0]) validProperties.indexOf(prop) >= 0 && (this[prop] = arguments[0][prop]);
+        }
+        var validateConfiguration = function(configuration) {
+            var validOptions = [ "startView", "minView", "minuteStep", "dropdownSelector" ];
+            for (var prop in configuration) if (validOptions.indexOf(prop) < 0) throw "invalid option: " + prop;
+            var validViews = [ "minute", "hour", "day", "month", "year" ];
+            if (validViews.indexOf(configuration.startView) < 0) throw "invalid startView value: " + configuration.startView;
+            if (validViews.indexOf(configuration.minView) < 0) throw "invalid minView value: " + configuration.minView;
+            if (validViews.indexOf(configuration.minView) > validViews.indexOf(configuration.startView)) throw "startView must be greater than minView";
+            if (!angular.isNumber(configuration.minuteStep)) throw "minuteStep must be numeric";
+            if (configuration.minuteStep <= 0 || configuration.minuteStep >= 60) throw "minuteStep must be greater than zero and less than 60";
+            if (null !== configuration.dropdownSelector && !angular.isString(configuration.dropdownSelector)) throw "dropdownSelector must be a string";
+            null === configuration.dropdownSelector || "undefined" != typeof jQuery && "function" == typeof jQuery().dropdown || ($log.error("Please DO NOT specify the dropdownSelector option unless you are using jQuery AND Bootstrap.js. Please include jQuery AND Bootstrap.js, or write code to close the dropdown in the on-set-time callback. \n\nThe dropdownSelector configuration option is being removed because it will not function properly."), 
+            delete configuration.dropdownSelector);
+        };
+        return {
+            restrict: "E",
+            require: "ngModel",
+            template: '<div class="datetimepicker table-responsive"><table class="table table-striped  {{ data.currentView }}-view">   <thead>       <tr>           <th class="left" data-ng-click="changeView(data.currentView, data.leftDate, $event)" data-ng-show="data.leftDate.selectable"><i class="glyphicon glyphicon-arrow-left"/></th>           <th class="switch" colspan="5" data-ng-show="data.previousViewDate.selectable" data-ng-click="changeView(data.previousView, data.previousViewDate, $event)">{{ data.previousViewDate.display }}</th>           <th class="right" data-ng-click="changeView(data.currentView, data.rightDate, $event)" data-ng-show="data.rightDate.selectable"><i class="glyphicon glyphicon-arrow-right"/></th>       </tr>       <tr>           <th class="dow" data-ng-repeat="day in data.dayNames" >{{ day }}</th>       </tr>   </thead>   <tbody>       <tr data-ng-if="data.currentView !== \'day\'" >           <td colspan="7" >              <span    class="{{ data.currentView }}"                        data-ng-repeat="dateObject in data.dates"                         data-ng-class="{active: dateObject.active, past: dateObject.past, future: dateObject.future, disabled: !dateObject.selectable}"                        data-ng-click="changeView(data.nextView, dateObject, $event)">{{ dateObject.display }}</span>            </td>       </tr>       <tr data-ng-if="data.currentView === \'day\'" data-ng-repeat="week in data.weeks">           <td data-ng-repeat="dateObject in week.dates"                data-ng-click="changeView(data.nextView, dateObject, $event)"               class="day"                data-ng-class="{active: dateObject.active, past: dateObject.past, future: dateObject.future, disabled: !dateObject.selectable}" >{{ dateObject.display }}</td>       </tr>   </tbody></table></div>',
+            scope: {
+                onSetTime: "&",
+                beforeRender: "&"
+            },
+            replace: !0,
+            link: function(scope, element, attrs, ngModelController) {
+                var directiveConfig = {};
+                attrs.datetimepickerConfig && (directiveConfig = scope.$parent.$eval(attrs.datetimepickerConfig));
+                var configuration = {};
+                angular.extend(configuration, defaultConfig, directiveConfig), validateConfiguration(configuration);
+                var startOfDecade = function(unixDate) {
+                    var startYear = 10 * parseInt(moment.utc(unixDate).year() / 10, 10);
+                    return moment.utc(unixDate).year(startYear).startOf("year");
+                }, dataFactory = {
+                    year: function(unixDate) {
+                        for (var selectedDate = moment.utc(unixDate).startOf("year"), startDecade = 10 * parseInt(selectedDate.year() / 10, 10), startDate = moment.utc(startOfDecade(unixDate)).subtract(1, "year").startOf("year"), activeYear = ngModelController.$modelValue ? moment(ngModelController.$modelValue).year() : 0, result = {
+                            currentView: "year",
+                            nextView: "year" === configuration.minView ? "setTime" : "month",
+                            previousViewDate: new DateObject({
+                                utcDateValue: null,
+                                display: startDecade + "-" + (startDecade + 9)
+                            }),
+                            leftDate: new DateObject({
+                                utcDateValue: moment.utc(startDate).subtract(9, "year").valueOf()
+                            }),
+                            rightDate: new DateObject({
+                                utcDateValue: moment.utc(startDate).add(11, "year").valueOf()
+                            }),
+                            dates: []
+                        }, i = 0; 12 > i; i += 1) {
+                            var yearMoment = moment.utc(startDate).add(i, "years"), dateValue = {
+                                utcDateValue: yearMoment.valueOf(),
+                                display: yearMoment.format("YYYY"),
+                                past: yearMoment.year() < startDecade,
+                                future: yearMoment.year() > startDecade + 9,
+                                active: yearMoment.year() === activeYear
+                            };
+                            result.dates.push(new DateObject(dateValue));
+                        }
+                        return result;
+                    },
+                    month: function(unixDate) {
+                        for (var startDate = moment.utc(unixDate).startOf("year"), previousViewDate = startOfDecade(unixDate), activeDate = ngModelController.$modelValue ? moment(ngModelController.$modelValue).format("YYYY-MMM") : 0, result = {
+                            previousView: "year",
+                            currentView: "month",
+                            nextView: "month" === configuration.minView ? "setTime" : "day",
+                            previousViewDate: new DateObject({
+                                utcDateValue: previousViewDate.valueOf(),
+                                display: startDate.format("YYYY")
+                            }),
+                            leftDate: new DateObject({
+                                utcDateValue: moment.utc(startDate).subtract(1, "year").valueOf()
+                            }),
+                            rightDate: new DateObject({
+                                utcDateValue: moment.utc(startDate).add(1, "year").valueOf()
+                            }),
+                            dates: []
+                        }, i = 0; 12 > i; i += 1) {
+                            var monthMoment = moment.utc(startDate).add(i, "months"), dateValue = {
+                                utcDateValue: monthMoment.valueOf(),
+                                display: monthMoment.format("MMM"),
+                                active: monthMoment.format("YYYY-MMM") === activeDate
+                            };
+                            result.dates.push(new DateObject(dateValue));
+                        }
+                        return result;
+                    },
+                    day: function(unixDate) {
+                        for (var selectedDate = moment.utc(unixDate), startOfMonth = moment.utc(selectedDate).startOf("month"), previousViewDate = moment.utc(selectedDate).startOf("year"), endOfMonth = moment.utc(selectedDate).endOf("month"), startDate = moment.utc(startOfMonth).subtract(Math.abs(startOfMonth.weekday()), "days"), activeDate = ngModelController.$modelValue ? moment(ngModelController.$modelValue).format("YYYY-MMM-DD") : "", result = {
+                            previousView: "month",
+                            currentView: "day",
+                            nextView: "day" === configuration.minView ? "setTime" : "hour",
+                            previousViewDate: new DateObject({
+                                utcDateValue: previousViewDate.valueOf(),
+                                display: startOfMonth.format("YYYY-MMM")
+                            }),
+                            leftDate: new DateObject({
+                                utcDateValue: moment.utc(startOfMonth).subtract(1, "months").valueOf()
+                            }),
+                            rightDate: new DateObject({
+                                utcDateValue: moment.utc(startOfMonth).add(1, "months").valueOf()
+                            }),
+                            dayNames: [],
+                            weeks: []
+                        }, dayNumber = 0; 7 > dayNumber; dayNumber += 1) result.dayNames.push(moment.utc().weekday(dayNumber).format("dd"));
+                        for (var i = 0; 6 > i; i += 1) {
+                            for (var week = {
+                                dates: []
+                            }, j = 0; 7 > j; j += 1) {
+                                var monthMoment = moment.utc(startDate).add(7 * i + j, "days"), dateValue = {
+                                    utcDateValue: monthMoment.valueOf(),
+                                    display: monthMoment.format("D"),
+                                    active: monthMoment.format("YYYY-MMM-DD") === activeDate,
+                                    past: monthMoment.isBefore(startOfMonth),
+                                    future: monthMoment.isAfter(endOfMonth)
+                                };
+                                week.dates.push(new DateObject(dateValue));
+                            }
+                            result.weeks.push(week);
+                        }
+                        return result;
+                    },
+                    hour: function(unixDate) {
+                        for (var selectedDate = moment.utc(unixDate).startOf("day"), previousViewDate = moment.utc(selectedDate).startOf("month"), activeFormat = ngModelController.$modelValue ? moment(ngModelController.$modelValue).format("YYYY-MM-DD H") : "", result = {
+                            previousView: "day",
+                            currentView: "hour",
+                            nextView: "hour" === configuration.minView ? "setTime" : "minute",
+                            previousViewDate: new DateObject({
+                                utcDateValue: previousViewDate.valueOf(),
+                                display: selectedDate.format("ll")
+                            }),
+                            leftDate: new DateObject({
+                                utcDateValue: moment.utc(selectedDate).subtract(1, "days").valueOf()
+                            }),
+                            rightDate: new DateObject({
+                                utcDateValue: moment.utc(selectedDate).add(1, "days").valueOf()
+                            }),
+                            dates: []
+                        }, i = 0; 24 > i; i += 1) {
+                            var hourMoment = moment.utc(selectedDate).add(i, "hours"), dateValue = {
+                                utcDateValue: hourMoment.valueOf(),
+                                display: hourMoment.format("LT"),
+                                active: hourMoment.format("YYYY-MM-DD H") === activeFormat
+                            };
+                            result.dates.push(new DateObject(dateValue));
+                        }
+                        return result;
+                    },
+                    minute: function(unixDate) {
+                        for (var selectedDate = moment.utc(unixDate).startOf("hour"), previousViewDate = moment.utc(selectedDate).startOf("day"), activeFormat = ngModelController.$modelValue ? moment(ngModelController.$modelValue).format("YYYY-MM-DD H:mm") : "", result = {
+                            previousView: "hour",
+                            currentView: "minute",
+                            nextView: "setTime",
+                            previousViewDate: new DateObject({
+                                utcDateValue: previousViewDate.valueOf(),
+                                display: selectedDate.format("lll")
+                            }),
+                            leftDate: new DateObject({
+                                utcDateValue: moment.utc(selectedDate).subtract(1, "hours").valueOf()
+                            }),
+                            rightDate: new DateObject({
+                                utcDateValue: moment.utc(selectedDate).add(1, "hours").valueOf()
+                            }),
+                            dates: []
+                        }, limit = 60 / configuration.minuteStep, i = 0; limit > i; i += 1) {
+                            var hourMoment = moment.utc(selectedDate).add(i * configuration.minuteStep, "minute"), dateValue = {
+                                utcDateValue: hourMoment.valueOf(),
+                                display: hourMoment.format("LT"),
+                                active: hourMoment.format("YYYY-MM-DD H:mm") === activeFormat
+                            };
+                            result.dates.push(new DateObject(dateValue));
+                        }
+                        return result;
+                    },
+                    setTime: function(unixDate) {
+                        var tempDate = new Date(unixDate), newDate = new Date(tempDate.getTime() + 6e4 * tempDate.getTimezoneOffset()), oldDate = ngModelController.$modelValue;
+                        return ngModelController.$setViewValue(newDate), configuration.dropdownSelector && jQuery(configuration.dropdownSelector).dropdown("toggle"), 
+                        scope.onSetTime({
+                            newDate: newDate,
+                            oldDate: oldDate
+                        }), dataFactory[configuration.startView](unixDate);
+                    }
+                }, getUTCTime = function(modelValue) {
+                    var tempDate = modelValue ? moment(modelValue).toDate() : new Date();
+                    return tempDate.getTime() - 6e4 * tempDate.getTimezoneOffset();
+                };
+                scope.changeView = function(viewName, dateObject, event) {
+                    if (event && (event.stopPropagation(), event.preventDefault()), viewName && dateObject.utcDateValue > -1/0 && dateObject.selectable && dataFactory[viewName]) {
+                        var result = dataFactory[viewName](dateObject.utcDateValue), weekDates = [];
+                        if (result.weeks) for (var i = 0; i < result.weeks.length; i += 1) for (var week = result.weeks[i], j = 0; j < week.dates.length; j += 1) {
+                            var weekDate = week.dates[j];
+                            weekDates.push(weekDate);
+                        }
+                        scope.beforeRender({
+                            $view: result.currentView,
+                            $dates: result.dates || weekDates,
+                            $leftDate: result.leftDate,
+                            $upDate: result.previousViewDate,
+                            $rightDate: result.rightDate
+                        }), scope.data = result;
+                    }
+                }, ngModelController.$render = function() {
+                    scope.changeView(configuration.startView, new DateObject({
+                        utcDateValue: getUTCTime(ngModelController.$viewValue)
+                    }));
+                };
+            }
+        };
+    } ]);
+});

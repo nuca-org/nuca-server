@@ -96,7 +96,7 @@ if (!NUCA) {
   NUCA = {};
 }
 
-angular.module('nuca', ['ngResource', 'ngRoute', 'ngAnimate', 'ui.bootstrap', 'angularMoment', 'toastr', 'ui.utils', 'uiGmapgoogle-maps', 'nuca.config', 'nuca.constants', 'nuca.services', 'nuca.login', 'nuca.controllers']);
+angular.module('nuca', ['ngResource', 'ngRoute', 'ngAnimate', 'ui.bootstrap', 'angularMoment', 'toastr', 'ui.utils', 'uiGmapgoogle-maps', 'ui.bootstrap.datetimepicker', 'nuca.config', 'nuca.constants', 'nuca.services', 'nuca.login', 'nuca.controllers']);
 
 angular.module('nuca.config', []);
 
@@ -108,20 +108,7 @@ angular.module('nuca.login', ['nuca.services']);
 
 angular.module('nuca.controllers', []);
 
-angular.module('nuca.controllers').controller('HomeController', [
-  '$scope', 'API', 'toastr', function($scope, API, toastr) {
-    $scope.date = new Date();
-    return $scope.daiUna = function() {
-      var entry;
-      entry = {
-        reporter_name: 'Corhas'
-      };
-      return API.SterilizationReq.add(entry, function(data) {
-        return alert('aaaaa');
-      });
-    };
-  }
-]);
+angular.module('nuca.controllers').controller('HomeController', ['$scope', 'API', 'toastr', function($scope, API, toastr) {}]);
 
 angular.module('nuca.controllers').controller('MainController', [
   '$scope', '$location', '$window', '$modal', 'toastr', 'Config', 'Constants', 'Login', 'API', function($scope, $location, $window, $modal, toastr, Config, Constants, Login, API) {
@@ -208,6 +195,11 @@ angular.module('nuca.controllers').controller('SterilizationReq2Controller', [
         return console.log(data);
       });
     };
+    $scope.openDatePicker = function($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+      return $scope.date_opened = true;
+    };
     return loadRequest();
   }
 ]);
@@ -256,10 +248,11 @@ angular.module('nuca').directive("locationInput", [
           options: {
             draggable: true
           },
-          coords: $scope.ngModel,
-          events: {
-            dragend: function(marker, eventName, args) {}
-          }
+          coords: $scope.ngModel || {
+            latitude: 0,
+            longitude: 0
+          },
+          events: {}
         };
         $scope.window = {
           options: {
@@ -296,22 +289,38 @@ angular.module('nuca').directive("locationInput", [
             });
           });
         };
-        $scope.$watch('ngModel', function(newValue, oldValue) {
-          if (!$scope.marker.coords && newValue) {
+        return $scope.$watch('ngModel', function(newValue, oldValue) {
+          if ($scope.marker.coords.latitude === 0 && newValue) {
             $scope.marker.coords = newValue;
             $scope.map.center = angular.copy(newValue);
           }
           return reverseGeocode();
         }, true);
-        return navigator.geolocation.getCurrentPosition(function(pos) {
-          return $scope.$apply(function() {
-            $scope.map.center = {
-              latitude: pos.coords.latitude,
-              longitude: pos.coords.longitude
-            };
-          });
-        });
+
+        /*
+        Temorarly remove geolocation, not stable
+        navigator.geolocation.getCurrentPosition (pos) ->
+          $scope.$apply () ->
+            return if $scope.ngModel #do not center if we already have a marked zone
+            $scope.map.center = { latitude: pos.coords.latitude, longitude: pos.coords.longitude }
+            return
+         */
       }
+    };
+  }
+]);
+
+angular.module('nuca').directive("picturesInput", [
+  function() {
+    return {
+      restrict: "E",
+      require: "?ngModel",
+      scope: {
+        ngModel: "="
+      },
+      templateUrl: "scripts/directives/picturesInput.html",
+      replace: false,
+      controller: function($scope, $element, $attrs) {}
     };
   }
 ]);
@@ -392,7 +401,8 @@ angular.module('nuca').config([
     };
   }
 ]).run([
-  '$rootScope', '$location', '$anchorScroll', function($rootScope, $location, $anchorScroll) {
+  '$rootScope', '$location', '$anchorScroll', 'amMoment', function($rootScope, $location, $anchorScroll, amMoment) {
+    amMoment.changeLocale('ro');
     return $rootScope.$on('$routeChangeSuccess', function(newRoute, oldRoute) {
       $location.hash('top-content');
       $anchorScroll();

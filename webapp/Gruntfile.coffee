@@ -31,6 +31,7 @@ module.exports = (grunt) ->
     "bower_components/angular-ui-utils/ui-utils.js"
     "bower_components/lodash/dist/lodash.js"
     "bower_components/angular-google-maps/dist/angular-google-maps.js"
+    "bower_components/angular-bootstrap-datetimepicker/src/js/datetimepicker.js"
     #"bower_components/angular-facebook/angular-facebook.js"
   ]
 
@@ -50,7 +51,8 @@ module.exports = (grunt) ->
   COMPONENT_CSS_FILES = [
     "font-awesome/fonts/*"
     "font-awesome/css/*"
-    "angular-xeditable/xeditable.css"
+    "angular-bootstrap-datetimepicker/src/css/*"
+    "bootstrap/fonts/*"
   ]
   
   LESS_FILES = {}

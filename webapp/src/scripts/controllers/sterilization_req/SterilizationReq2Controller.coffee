@@ -6,7 +6,6 @@ angular.module 'nuca.controllers'
     API.SterilizationReq.query { id: $routeParams.id }, (data) ->
       $scope.sterilizationReq = data[0]
 
-
   $scope.removeCat = (cat) ->
     if confirm('Sunteti sigur ca doriti sa stergeti aceasta inregistrare?')
       idx = $scope.sterilizationReq.cats.indexOf(cat)
@@ -19,6 +18,11 @@ angular.module 'nuca.controllers'
     API.SterilizationReq.update { id: $routeParams.id }, $scope.sterilizationReq, (data) ->
       console.log data
 
+
+  $scope.openDatePicker = ($event) ->
+    $event.preventDefault()
+    $event.stopPropagation()
+    $scope.date_opened = true
 
   loadRequest()
 ]

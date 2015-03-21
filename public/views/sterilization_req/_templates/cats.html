@@ -1,0 +1,42 @@
+﻿<div class="table-responsive">
+    <table class="table table-bordered table-condensed table-striped table-cats">
+        <thead>
+            <tr>
+                <th>Sex</th>
+                <th>Varsta</th>
+                <th>Culoare</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="cat in sterilizationReq.cats">
+                <td class="col-xs-3">
+                    <select ng-model="cat.gender" class="form-control" ng-options="gender.id as gender.name for gender in genders"></select>
+                </td>
+                <td class="col-xs-2">
+                    <input type="text" class="form-control" ng-model="cat.age">
+                </td>
+                <td class="col-xs-4">
+                    <input type="text" class="form-control" ng-model="cat.color">
+                </td>
+                <td class="col-xs-2">
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-model="cat.aggressive">Agresiva</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" ng-model="cat.pregnant">Gestanta</label>
+                    </div>
+                </td>
+                <td class="col-xs-1">
+                    <a ng-click="removeCat(cat)"><span class="fa fa-2x fa-trash"></span></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="row">
+    <div class="col-sm-4">
+        <button type="button" class="btn btn-default" ng-click="addCat()">Adauga Pisica</button>
+    </div>
+</div>

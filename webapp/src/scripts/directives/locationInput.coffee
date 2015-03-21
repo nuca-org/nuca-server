@@ -36,9 +36,9 @@ angular.module 'nuca'
       id: 0
       options: 
         draggable: true
-      coords: $scope.ngModel# || {latitude: 0, longitude: 0}
-      events:
-        dragend: (marker, eventName, args) ->
+      coords: $scope.ngModel || {latitude: 0, longitude: 0}
+      events: {}
+        #dragend: (marker, eventName, args) ->
 
     $scope.window =
       options:
@@ -49,7 +49,7 @@ angular.module 'nuca'
       $scope.ngModel.latitude = latLng.lat()
       $scope.ngModel.longitude = latLng.lng()
 
-    reverseGeocode = () ->      
+    reverseGeocode = () -> 
       return if !$scope.ngModel
       uiGmapGoogleMapApi.then (maps) ->
         geocoder = new maps.Geocoder()
@@ -63,15 +63,19 @@ angular.module 'nuca'
       
     $scope.$watch 'ngModel', (newValue, oldValue) ->
       #preset values if they were not initially set
-      if !$scope.marker.coords && newValue
+      if $scope.marker.coords.latitude == 0 && newValue
         $scope.marker.coords = newValue
         $scope.map.center = angular.copy newValue
-      reverseGeocode()      
+      reverseGeocode()
     , true
 
+    ###
+    Temorarly remove geolocation, not stable
     navigator.geolocation.getCurrentPosition (pos) ->
       $scope.$apply () ->
+        return if $scope.ngModel #do not center if we already have a marked zone
         $scope.map.center = { latitude: pos.coords.latitude, longitude: pos.coords.longitude }
         return
+    ###
 ]
 
