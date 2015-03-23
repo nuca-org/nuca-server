@@ -75,10 +75,8 @@ angular.module 'nuca'
       reverseGeocode()
     , true
     
-    
     $scope.map.center = angular.copy $scope.ngModel if $scope.ngModel?
-
-    #fix the issue if the map was hidden on load by refreshing
+    #fix problem if the map was hidden on load by refreshing
     $timeout () ->
       $scope.mapControl.refresh($scope.ngModel) if $scope.mapControl?
 
