@@ -3,50 +3,50 @@
         <h3 class="panel-title">Cerere Noua</h3>
     </div>
     <div class="panel-body">
-        <form class="form-horizontal" role="form" name="editForm">
+        <form class="form-horizontal" name="editForm">
             <div class="row">
                 <div class="col-lg-6">
                     <div class="form-group">
-                        <label class="control-label col-sm-4" for="email">Nume</label>
+                        <label class="control-label col-sm-4">Nume</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" ng-model="sterilizationReq.reporter_name" ng-required="true" placeholder="Nume si prenume">
+                            <input type="text" class="form-control" ng-model="request.reporter_name" ng-required="true" placeholder="Nume si prenume">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-4" for="email">Email</label>
+                        <label class="control-label col-sm-4">Email</label>
                         <div class="col-sm-8">
-                            <input type="email" class="form-control" ng-model="sterilizationReq.email" ng-required="true">
+                            <input type="email" class="form-control" ng-model="request.email" ng-required="true">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-4" for="email">Telefon</label>
+                        <label class="control-label col-sm-4">Telefon</label>
                         <div class="col-sm-8">
-                            <input type="tel" class="form-control" ng-model="sterilizationReq.reporter_phone" ng-required="true" ui-mask="(999) 999-9999">
+                            <input type="tel" class="form-control" ng-model="request.reporter_phone" ng-required="true" ui-mask="(999) 999-9999">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="col-sm-8  col-sm-offset-4 checkbox">
                             <label tooltip="In cazul in care nu puteti captura pisicile introduceti mai jos contactul persoanei care le cunoaste mai bine">
-                                <input type="checkbox" ng-model="sterilizationReq.reporter_cannot_capture">Nu le pot captura
+                                <input type="checkbox" ng-model="request.reporter_cannot_capture">Nu le pot captura
                             </label>
                         </div>
                     </div>
-                    <div class="form-group" collapse="!sterilizationReq.reporter_cannot_capture">
+                    <div class="form-group" collapse="!request.reporter_cannot_capture">
                         <label class="control-label col-sm-4">Nume intermediar</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" ng-model="sterilizationReq.intermediate_name" placeholder="Nume si prenume" ng-required="sterilizationReq.reporter_cannot_capture">
+                            <input type="text" class="form-control" ng-model="request.intermediate_name" placeholder="Nume si prenume" ng-required="request.reporter_cannot_capture">
                         </div>
                     </div>
-                    <div class="form-group" collapse="!sterilizationReq.reporter_cannot_capture">
+                    <div class="form-group" collapse="!request.reporter_cannot_capture">
                         <label class="control-label col-sm-4">Telefon intermediar</label>
                         <div class="col-sm-8">
-                            <input type="tel" class="form-control" ng-model="sterilizationReq.intermediate_phone" ui-mask="(999) 999-9999" ng-required="sterilizationReq.reporter_cannot_capture">
+                            <input type="tel" class="form-control" ng-model="request.intermediate_phone" ui-mask="(999) 999-9999" ng-required="request.reporter_cannot_capture">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-4">Numar pisici</label>
                         <div class="col-sm-4">
-                            <input type="number" class="form-control" ng-model="sterilizationReq.cats_no" min="1" max="100">
+                            <input type="number" class="form-control" ng-model="request.cats_no" min="1" max="100">
                         </div>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                             <h3 class="panel-title">Locatie</h3>
                         </div>
                         <div class="panel-body">
-                            <location-input ng-model="sterilizationReq.location" ng-required="true"></location-input>
+                            <location-input ng-model="request.location" ng-required="true"></location-input>
                         </div>
                     </div>
                     <div class="panel panel-info">
@@ -64,7 +64,7 @@
                             <h3 class="panel-title">Poze</h3>
                         </div>
                         <div class="panel-body">
-                            <pictures-input ng-model="sterilizationReq.pictures"></pictures-input>
+                            <pictures-input ng-model="request.pictures"></pictures-input>
                         </div>
                     </div>
                 </div>

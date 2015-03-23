@@ -31,7 +31,7 @@ angular.module 'nuca.controllers'
   #---------------------
 
   initMain = () ->
-    i = 0
+    $scope.isAdmin = true
  
   initMain()
 ]

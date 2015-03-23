@@ -138,30 +138,89 @@ angular.module('nuca.controllers').controller('MainController', [
       return toastr.error('Server Error <br/>' + error.status + ' ' + error.statusText);
     });
     initMain = function() {
-      var i;
-      return i = 0;
+      return $scope.isAdmin = true;
     };
     return initMain();
   }
 ]);
 
+angular.module('nuca.controllers').controller('AccomodationPopUpController', [
+  '$scope', '$modalInstance', 'API', 'DataHandler', 'popUpParam', function($scope, $modalInstance, API, DataHandler, popUpParam) {
+    $scope.acc = angular.copy(popUpParam.acc || {});
+    $scope.addNew = popUpParam.acc == null;
+    $scope.save = function() {
+      var messagePosts;
+      messagePosts = [];
+      if ($scope.addNew) {
+        messagePosts.push([API.Accomodation, 'add', {}, $scope.acc]);
+      }
+      if (!$scope.addNew) {
+        messagePosts.push([
+          API.Accomodation, 'update', {
+            id: $scope.acc.id
+          }, $scope.acc
+        ]);
+      }
+      return DataHandler.process(messagePosts, function(data) {
+        var action;
+        action = $scope.addNew ? 'adaugata' : 'modificata';
+        return $modalInstance.close("Cazare " + action + " cu success");
+      });
+    };
+    return $scope.cancel = function() {
+      return $modalInstance.dismiss('cancel');
+    };
+  }
+]);
+
+angular.module('nuca.controllers').controller('AccomodationsController', [
+  '$scope', '$modal', 'API', 'toastr', function($scope, $modal, API, toastr) {
+    var loadAccomodations;
+    loadAccomodations = function() {
+      return API.Accomodation.query({}, function(data) {
+        return $scope.accomodations = data;
+      });
+    };
+    $scope.openAccomodationPopUp = function(acc) {
+      var modalInstance;
+      modalInstance = $modal.open({
+        templateUrl: 'views/accomodations/accomodation_popup.html',
+        controller: 'AccomodationPopUpController',
+        resolve: {
+          popUpParam: function() {
+            return {
+              acc: acc
+            };
+          }
+        }
+      });
+      return modalInstance.result.then(function(msg) {
+        toastr.success(msg);
+        return loadAccomodations();
+      });
+    };
+    $scope["delete"] = function(acc) {
+      if (!confirm('Sunteti sigur ca doriti sa eliminati aceasta cazare?')) {
+        return;
+      }
+      return API.Accomodation["delete"]({
+        id: acc.id
+      }, function(data) {
+        toastr.success('Cazare eliminata cu success');
+        return loadAccomodations();
+      });
+    };
+    return loadAccomodations();
+  }
+]);
+
 angular.module('nuca.controllers').controller('SterilizationReq1Controller', [
   '$scope', 'API', function($scope, API) {
-    $scope.sterilizationReq = {
+    $scope.request = {
       cats: [{}]
     };
-    $scope.removeCat = function(cat) {
-      var idx;
-      if (confirm('Sunteti sigur ca doriti sa stergeti aceasta inregistrare?')) {
-        idx = $scope.sterilizationReq.cats.indexOf(cat);
-        return $scope.sterilizationReq.cats.splice(idx, 1);
-      }
-    };
-    $scope.addCat = function() {
-      return $scope.sterilizationReq.cats.push({});
-    };
     return $scope.createRequest = function() {
-      return API.SterilizationReq.add($scope.sterilizationReq, function(data) {
+      return API.SterilizationReq.add($scope.request, function(data) {
         return $scope.goto('/confirmare_cerere/' + data.id);
       });
     };
@@ -175,23 +234,23 @@ angular.module('nuca.controllers').controller('SterilizationReq2Controller', [
       return API.SterilizationReq.query({
         id: $routeParams.id
       }, function(data) {
-        return $scope.sterilizationReq = data[0];
+        return $scope.request = data[0];
       });
     };
     $scope.removeCat = function(cat) {
       var idx;
       if (confirm('Sunteti sigur ca doriti sa stergeti aceasta inregistrare?')) {
-        idx = $scope.sterilizationReq.cats.indexOf(cat);
-        return $scope.sterilizationReq.cats.splice(idx, 1);
+        idx = $scope.request.cats.indexOf(cat);
+        return $scope.request.cats.splice(idx, 1);
       }
     };
     $scope.addCat = function() {
-      return $scope.sterilizationReq.cats.push({});
+      return $scope.request.cats.push({});
     };
     $scope.updateRequest = function() {
       return API.SterilizationReq.update({
         id: $routeParams.id
-      }, $scope.sterilizationReq, function(data) {
+      }, $scope.request, function(data) {
         return console.log(data);
       });
     };
@@ -205,7 +264,7 @@ angular.module('nuca.controllers').controller('SterilizationReq2Controller', [
 ]);
 
 angular.module('nuca').directive("locationInput", [
-  "uiGmapGoogleMapApi", function(uiGmapGoogleMapApi) {
+  "$timeout", "uiGmapGoogleMapApi", function($timeout, uiGmapGoogleMapApi) {
     return {
       restrict: "E",
       require: "?ngModel",
@@ -229,6 +288,7 @@ angular.module('nuca').directive("locationInput", [
             }
           }
         };
+        $scope.mapControl = {};
         $scope.map = {
           center: {
             latitude: 46.766667,
@@ -239,6 +299,16 @@ angular.module('nuca').directive("locationInput", [
             click: function(map, eventName, args) {
               return $scope.$apply(function() {
                 return setModel(args[0].latLng);
+              });
+            },
+            tilesloaded: function(map, eventName, args) {
+              return $scope.$apply(function() {
+                return uiGmapGoogleMapApi.then(function(maps) {
+                  maps.event.trigger(map, 'resize');
+                  if ($scope.ngModel != null) {
+                    return $scope.map.center = angular.copy($scope.ngModel);
+                  }
+                });
               });
             }
           }
@@ -268,17 +338,18 @@ angular.module('nuca').directive("locationInput", [
           return $scope.$parent.editForm.$setDirty();
         };
         reverseGeocode = function() {
-          if (!$scope.ngModel) {
+          if ($scope.ngModel == null) {
             return;
           }
           return uiGmapGoogleMapApi.then(function(maps) {
-            var geocoder, latlng;
+            var geocoder, latlng, loadMap;
+            loadMap = true;
             geocoder = new maps.Geocoder();
             latlng = new maps.LatLng($scope.ngModel.latitude, $scope.ngModel.longitude);
             return geocoder.geocode({
               'latLng': latlng
             }, function(results, status) {
-              if (status === google.maps.GeocoderStatus.OK) {
+              if (status === maps.GeocoderStatus.OK) {
                 return $scope.$apply(function() {
                   if (results[0]) {
                     return $scope.window.content = results[0].formatted_address;
@@ -297,6 +368,12 @@ angular.module('nuca').directive("locationInput", [
           }
           return reverseGeocode();
         }, true);
+
+        /*
+        $timeout () ->
+          $scope.mapControl.refresh()
+          $scope.marker.coords = $scope.ngModel
+         */
 
         /*
         Temorarly remove geolocation, not stable
@@ -359,15 +436,18 @@ angular.module('nuca').config([
       resolve: resolveAuth,
       label: 'Home'
     });
+    $routeProvider.when('/gestiune_cazari', {
+      controller: 'AccomodationsController',
+      templateUrl: 'views/accomodations/accomodations.html',
+      resolve: resolveAuth
+    });
     $routeProvider.when('/cerere_noua', {
       controller: 'SterilizationReq1Controller',
-      templateUrl: 'views/sterilization_req/sterilization_req1.html',
-      resolve: resolveAuth
+      templateUrl: 'views/sterilization_req/sterilization_req1.html'
     });
     $routeProvider.when('/confirmare_cerere/:id', {
       controller: 'SterilizationReq2Controller',
-      templateUrl: 'views/sterilization_req/sterilization_req2.html',
-      resolve: resolveAuth
+      templateUrl: 'views/sterilization_req/sterilization_req2.html'
     });
     return $routeProvider.otherwise({
       redirectTo: '/'
@@ -450,6 +530,9 @@ angular.module('nuca.services').factory('API', [
       {
         name: 'SterilizationReq',
         url: 'sterilization_req.json'
+      }, {
+        name: 'Accomodation',
+        url: 'accomodations.json'
       }
     ];
     createService = function(name, url) {

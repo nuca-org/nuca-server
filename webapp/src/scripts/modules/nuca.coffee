@@ -28,9 +28,11 @@ angular.module 'nuca'
       return "/"
 
   $routeProvider.when '/', controller: 'HomeController', templateUrl: 'views/home.html', redirectTo: angularRedirect, resolve: resolveAuth, label: 'Home'
+  #---- accomodations ------
+  $routeProvider.when '/gestiune_cazari', controller: 'AccomodationsController', templateUrl: 'views/accomodations/accomodations.html', resolve: resolveAuth
   #---- sterilization requets ------
-  $routeProvider.when '/cerere_noua', controller: 'SterilizationReq1Controller', templateUrl: 'views/sterilization_req/sterilization_req1.html', resolve: resolveAuth
-  $routeProvider.when '/confirmare_cerere/:id', controller: 'SterilizationReq2Controller', templateUrl: 'views/sterilization_req/sterilization_req2.html', resolve: resolveAuth
+  $routeProvider.when '/cerere_noua', controller: 'SterilizationReq1Controller', templateUrl: 'views/sterilization_req/sterilization_req1.html'
+  $routeProvider.when '/confirmare_cerere/:id', controller: 'SterilizationReq2Controller', templateUrl: 'views/sterilization_req/sterilization_req2.html'
   
 
   $routeProvider.otherwise redirectTo: '/'

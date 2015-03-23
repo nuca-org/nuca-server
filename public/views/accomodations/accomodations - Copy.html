@@ -1,0 +1,48 @@
+﻿<script type="text/ng-template" id="accomodation.html">
+    <div class="modal-header">
+        <h3 class="modal-title">I'm a modal!</h3>
+    </div>
+    <div class="modal-body">
+        <ul>
+            <li ng-repeat="item in items">
+                <a ng-click="selected.item = item">{{ item }}</a>
+            </li>
+        </ul>
+        Selected: <b>{{ selected.item }}</b>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</script>
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Gestiune Cazari</h3>
+    </div>
+    <div class="panel-body">
+        <table class="table table-bordered table-condensed table-striped">
+            <thead>
+                <tr>
+                    <th>Nume</th>
+                    <th>Telefon</th>
+                    <th>Locuri Totale</th>
+                    <th>Locuri Libere</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="acc in accomodations">
+                    <td>{{acc.name}}</td>
+                    <td>{{acc.phone}}</td>
+                    <td>{{acc.total_places}}</td>
+                    <td>{{acc.free_places}}</td>
+                    <td><a ng-click="openAccomodationPopUp(acc)"><span class="fa fa-2x fa-pencil"></span></a></td>
+                    <td><a ng-click="removeAccomodation(acc)"><span class="fa fa-2x fa-trash"></span></a></td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-sm-offset-6 col-sm-6 col-lg-offset-9 col-lg-3">
+            <button type="submit" class="btn btn-primary btn-block" ng-click="openAccomodationPopUp()">Cazare Noua</button>
+        </div>
+    </div>
+</div>

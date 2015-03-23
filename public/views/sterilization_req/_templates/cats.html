@@ -10,7 +10,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="cat in sterilizationReq.cats">
+            <tr ng-repeat="cat in request.cats">
                 <td class="col-xs-3">
                     <select ng-model="cat.gender" class="form-control" ng-options="gender.id as gender.name for gender in genders"></select>
                 </td>

@@ -2,7 +2,7 @@
     <script type="text/ng-template" id="searchbox.tpl.html">
         <input type="text" placeholder="Introduceti adresa" class="form-control">
     </script>
-    <ui-gmap-google-map center='map.center' zoom='map.zoom' events="map.events">
+    <ui-gmap-google-map center='map.center' zoom='map.zoom' events="map.events" control="mapControl">
         <ui-gmap-marker coords="marker.coords" options="marker.options" events="marker.events" idkey="marker.id">
             <ui-gmap-window options="window.options" closeclick="window.options.visible = false">
                 <span class="window-content">{{window.content}}</span>

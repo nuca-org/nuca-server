@@ -31,7 +31,11 @@ a.accordion-toggle {
     position: relative;
 
     .form-control {
-        width: 250px;
+        width: 150px;
+
+		@media (min-width:@screen-xs) {
+            width: 250px;
+		}
     }
 
     .angular-google-map-container {

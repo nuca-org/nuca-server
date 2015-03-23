@@ -1,6 +1,6 @@
 angular.module 'nuca'
 
-.directive "locationInput", ["uiGmapGoogleMapApi", (uiGmapGoogleMapApi) ->
+.directive "locationInput", ["$timeout", "uiGmapGoogleMapApi", ($timeout, uiGmapGoogleMapApi) ->
   restrict: "E"
   require: "?ngModel"
 
@@ -12,7 +12,7 @@ angular.module 'nuca'
   replace: false
 
   controller: ($scope, $element, $attrs) ->
-
+  
     $scope.searchbox = 
       events: 
         places_changed: (searchBox) ->
@@ -21,6 +21,8 @@ angular.module 'nuca'
           setModel place.geometry.location
           #center map to location with a copy of the current position
           $scope.map.center = angular.copy $scope.ngModel
+
+    $scope.mapControl = {}
 
     $scope.map = 
       center: 
@@ -31,6 +33,12 @@ angular.module 'nuca'
         click: (map, eventName, args) ->
           $scope.$apply () ->
             setModel args[0].latLng
+        tilesloaded: (map, eventName, args) ->
+          $scope.$apply () ->
+            uiGmapGoogleMapApi.then (maps) ->
+              #resize map after display, center it if any value was specified
+              maps.event.trigger(map, 'resize')
+              $scope.map.center = angular.copy $scope.ngModel if $scope.ngModel?
 
     $scope.marker = 
       id: 0
@@ -53,12 +61,13 @@ angular.module 'nuca'
       $scope.$parent.editForm.$setDirty()
 
     reverseGeocode = () -> 
-      return if !$scope.ngModel
+      return if !$scope.ngModel?
       uiGmapGoogleMapApi.then (maps) ->
+        loadMap = true
         geocoder = new maps.Geocoder()
         latlng = new maps.LatLng($scope.ngModel.latitude, $scope.ngModel.longitude)
         geocoder.geocode {'latLng': latlng}, (results, status) ->
-          if status == google.maps.GeocoderStatus.OK 
+          if status == maps.GeocoderStatus.OK 
             $scope.$apply () ->
               $scope.window.content = results[0].formatted_address if results[0]
           else
@@ -72,6 +81,14 @@ angular.module 'nuca'
       reverseGeocode()
     , true
 
+
+    ###
+    $timeout () ->
+      $scope.mapControl.refresh()
+      $scope.marker.coords = $scope.ngModel
+    ###
+    #fix hide/show bug
+        
     ###
     Temorarly remove geolocation, not stable
     navigator.geolocation.getCurrentPosition (pos) ->

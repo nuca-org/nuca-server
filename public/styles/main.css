@@ -6756,7 +6756,12 @@ a.accordion-toggle {
   position: relative;
 }
 .choose-location .form-control {
-  width: 250px;
+  width: 150px;
+}
+@media (min-width: 480px) {
+  .choose-location .form-control {
+    width: 250px;
+  }
 }
 .choose-location .angular-google-map-container {
   border: 1px solid #ccc;
