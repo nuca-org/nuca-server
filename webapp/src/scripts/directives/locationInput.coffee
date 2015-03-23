@@ -33,12 +33,6 @@ angular.module 'nuca'
         click: (map, eventName, args) ->
           $scope.$apply () ->
             setModel args[0].latLng
-        tilesloaded: (map, eventName, args) ->
-          $scope.$apply () ->
-            uiGmapGoogleMapApi.then (maps) ->
-              #resize map after display, center it if any value was specified
-              maps.event.trigger(map, 'resize')
-              $scope.map.center = angular.copy $scope.ngModel if $scope.ngModel?
 
     $scope.marker = 
       id: 0
@@ -80,15 +74,14 @@ angular.module 'nuca'
         $scope.map.center = angular.copy newValue
       reverseGeocode()
     , true
+    
+    
+    $scope.map.center = angular.copy $scope.ngModel if $scope.ngModel?
 
-
-    ###
+    #fix the issue if the map was hidden on load by refreshing
     $timeout () ->
-      $scope.mapControl.refresh()
-      $scope.marker.coords = $scope.ngModel
-    ###
-    #fix hide/show bug
-        
+      $scope.mapControl.refresh($scope.ngModel) if $scope.mapControl?
+
     ###
     Temorarly remove geolocation, not stable
     navigator.geolocation.getCurrentPosition (pos) ->

@@ -300,16 +300,6 @@ angular.module('nuca').directive("locationInput", [
               return $scope.$apply(function() {
                 return setModel(args[0].latLng);
               });
-            },
-            tilesloaded: function(map, eventName, args) {
-              return $scope.$apply(function() {
-                return uiGmapGoogleMapApi.then(function(maps) {
-                  maps.event.trigger(map, 'resize');
-                  if ($scope.ngModel != null) {
-                    return $scope.map.center = angular.copy($scope.ngModel);
-                  }
-                });
-              });
             }
           }
         };
@@ -361,19 +351,21 @@ angular.module('nuca').directive("locationInput", [
             });
           });
         };
-        return $scope.$watch('ngModel', function(newValue, oldValue) {
+        $scope.$watch('ngModel', function(newValue, oldValue) {
           if ($scope.marker.coords.latitude === 0 && newValue) {
             $scope.marker.coords = newValue;
             $scope.map.center = angular.copy(newValue);
           }
           return reverseGeocode();
         }, true);
-
-        /*
-        $timeout () ->
-          $scope.mapControl.refresh()
-          $scope.marker.coords = $scope.ngModel
-         */
+        if ($scope.ngModel != null) {
+          $scope.map.center = angular.copy($scope.ngModel);
+        }
+        return $timeout(function() {
+          if ($scope.mapControl != null) {
+            return $scope.mapControl.refresh($scope.ngModel);
+          }
+        });
 
         /*
         Temorarly remove geolocation, not stable
