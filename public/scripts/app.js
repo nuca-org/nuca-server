@@ -362,7 +362,7 @@ angular.module('nuca').directive("locationInput", [
           $scope.map.center = angular.copy($scope.ngModel);
         }
         return $timeout(function() {
-          if ($scope.mapControl != null) {
+          if ($scope.mapControl.refresh != null) {
             return $scope.mapControl.refresh($scope.ngModel);
           }
         });

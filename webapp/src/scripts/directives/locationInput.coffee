@@ -78,7 +78,7 @@ angular.module 'nuca'
     $scope.map.center = angular.copy $scope.ngModel if $scope.ngModel?
     #fix problem if the map was hidden on load by refreshing
     $timeout () ->
-      $scope.mapControl.refresh($scope.ngModel) if $scope.mapControl?
+      $scope.mapControl.refresh($scope.ngModel) if $scope.mapControl.refresh?
 
     ###
     Temorarly remove geolocation, not stable

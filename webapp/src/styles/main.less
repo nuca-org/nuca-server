@@ -31,11 +31,12 @@ a.accordion-toggle {
     position: relative;
 
     .form-control {
-        width: 150px;
-
-		@media (min-width:@screen-xs) {
-            width: 250px;
-		}
+        width: 50%;
+        //width: 150px;
+        @media (min-width:@screen-xs) {
+            width: 70%;
+            //width: 250px;
+        }
     }
 
     .angular-google-map-container {
@@ -46,6 +47,10 @@ a.accordion-toggle {
             text-wrap: normal;
         }
     }
+}
+
+.pac-container {
+    z-index: 2000;
 }
 
 .ng-invalid > .choose-location .angular-google-map-container {
