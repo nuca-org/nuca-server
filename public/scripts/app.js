@@ -269,7 +269,18 @@ angular.module('nuca.controllers').controller('NewRequestController', [
   }
 ]);
 
-angular.module('nuca.controllers').controller('RequestsMapController', ['$scope', 'API', function($scope, API) {}]);
+angular.module('nuca.controllers').controller('RequestsMapController', [
+  '$scope', 'API', function($scope, API) {
+    $scope.mapControl = {};
+    return $scope.map = {
+      center: {
+        latitude: 46.766667,
+        longitude: 23.58333300000004
+      },
+      zoom: 17
+    };
+  }
+]);
 
 angular.module('nuca').directive("datetimeInput", function() {
   return {

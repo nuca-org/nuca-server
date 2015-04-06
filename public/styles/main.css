@@ -6774,6 +6774,18 @@ a.accordion-toggle {
 .choose-location .angular-google-map-container .window-content {
   text-wrap: normal;
 }
+.request-map .angular-google-map-container {
+  border: 1px solid #ccc;
+  height: 300px;
+}
+@media (min-width: 768px) {
+  .request-map .angular-google-map-container {
+    height: 500px;
+  }
+}
+.request-map .angular-google-map-container .window-content {
+  text-wrap: normal;
+}
 .pac-container {
   z-index: 2000;
 }

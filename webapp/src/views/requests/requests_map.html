@@ -6,35 +6,34 @@
 
         <form class="form-horizontal" name="editForm">
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <div class="form-group">
-                        <label class="control-label col-sm-3">Nume contact</label>
+                        <label class="control-label col-sm-2">Nume contact</label>
                         <div class="col-sm-9">
                             <input type="text" class="form-control" placeholder="Nume si prenume" ng-model="filter.reporter_name">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-3">Din</label>
-                        <div class="col-sm-9">
+                        <label class="control-label col-sm-2">Din</label>
+                        <div class="col-sm-4">
                             <datetime-input ng-model="filter.date_from"></datetime-input>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label col-sm-3">Pana la</label>
-                        <div class="col-sm-9">
+                        <label class="control-label col-sm-1">Pana la</label>
+                        <div class="col-sm-4">
                             <datetime-input ng-model="filter.date_to"></datetime-input>
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-9 col-sm-offset-3">
+                        <div class="col-sm-9 col-sm-offset-2">
                             <button type="submit" class="btn btn-primary">Filtrare</button>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-6">
-                </div>
             </div>
         </form>
-
-    </div>
+        <!--TODO: implement map-->
+        <div class="request-map">
+            <ui-gmap-google-map center='map.center' zoom='map.zoom' control="mapControl">
+            </ui-gmap-google-map>
+        </div>
 </div>
