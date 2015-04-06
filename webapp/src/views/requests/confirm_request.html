@@ -44,16 +44,7 @@
                     <div class="form-group">
                         <label class="control-label col-sm-4">Data/Ora</label>
                         <div class="col-sm-8">
-                            <div class="dropdown" dropdown is-open="request_date_open">
-                                <a class="dropdown-toggle" dropdown-toggle>
-                                    <div class="input-group">
-                                        <span class="form-control">{{ request.request_date | amDateFormat:'DD MMMM, YYYY HH:mm' }}</span><span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                                    </div>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <datetimepicker ng-model="request.request_date" on-set-time="request_date_open = false" />
-                                </ul>
-                            </div>
+                            <datetime-input ng-model="request.request_date" ng-required="true"></datetime-input>
                         </div>
                     </div>
                     <div class="form-group">

@@ -29,10 +29,11 @@ angular.module 'nuca'
 
   $routeProvider.when '/', controller: 'HomeController', templateUrl: 'views/home.html', redirectTo: angularRedirect, resolve: resolveAuth, label: 'Home'
   #---- accomodations ------
-  $routeProvider.when '/gestiune_cazari', controller: 'AccomodationsController', templateUrl: 'views/accomodations/accomodations.html', resolve: resolveAuth
-  #---- sterilization requets ------
+  $routeProvider.when '/administrare/cazari', controller: 'AccomodationsController', templateUrl: 'views/accomodations/accomodations.html', resolve: resolveAuth
+  #---- requests ------
   $routeProvider.when '/cerere_noua', controller: 'NewRequestController', templateUrl: 'views/requests/new_request.html'
   $routeProvider.when '/confirmare_cerere/:id', controller: 'ConfirmRequestController', templateUrl: 'views/requests/confirm_request.html'
+  $routeProvider.when '/administrare/harta', controller: 'RequestsMapController', templateUrl: 'views/requests/requests_map.html', resolve: resolveAuth
   
 
   $routeProvider.otherwise redirectTo: '/'

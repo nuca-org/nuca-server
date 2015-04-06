@@ -11,7 +11,7 @@ angular.module 'nuca'
 
   replace: false
 
-  controller: ($scope, $element, $attrs) ->
+  link: (scope, element, attrs) ->
 
 ]
 

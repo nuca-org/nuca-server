@@ -14,10 +14,11 @@
                 <li ng-class="{'active': getCurrentPath() == '/'}"><a href="/#/" ng-click="navCollapsed = true">Acasa</a></li>
                 <li ng-class="{'active': getCurrentPath() == '/cerere_noua'}"><a href="/#/cerere_noua" ng-click="navCollapsed = true">Cerere Noua</a></li>
                 <li class="active" ng-if="getCurrentPath().indexOf('/confirmare_cerere') != -1"><a>Confirmare Cerere</a></li>
-                <li class="dropdown" dropdown ng-if="isAdmin">
+                <li class="dropdown" dropdown ng-if="isAdmin" ng-class="{'active': getCurrentPath().indexOf('/administrare/') != -1}">
                     <a href="#" class="dropdown-toggle" dropdown-toggle>Administrare <span class="caret"></span></a>
                     <ul class="dropdown-menu" role="menu">
-                        <li><a href="/#/gestiune_cazari">Gestiune Cazari</a></li>
+                        <li><a href="/#/administrare/cazari">Gestiune Cazari</a></li>
+                        <li><a href="/#/administrare/harta">Harta Cereri</a></li>
                     </ul>
                 </li>
             </ul>

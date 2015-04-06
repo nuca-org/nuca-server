@@ -269,6 +269,35 @@ angular.module('nuca.controllers').controller('NewRequestController', [
   }
 ]);
 
+angular.module('nuca.controllers').controller('RequestsMapController', ['$scope', 'API', function($scope, API) {}]);
+
+angular.module('nuca').directive("datetimeInput", function() {
+  return {
+    restrict: "E",
+    require: "?ngModel",
+    scope: {
+      ngModel: "="
+    },
+    templateUrl: "scripts/directives/datetimeInput.html",
+    replace: true,
+    link: function(scope, element, attrs, ctrl) {
+      scope.status = {
+        open: false
+      };
+      scope.open = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        return scope.status.open = !scope.status.open;
+      };
+      return scope.clear = function($event) {
+        $event.preventDefault();
+        $event.stopPropagation();
+        return ctrl.$setViewValue(null);
+      };
+    }
+  };
+});
+
 angular.module('nuca').directive("locationInput", [
   "$timeout", "uiGmapGoogleMapApi", function($timeout, uiGmapGoogleMapApi) {
     return {
@@ -396,7 +425,7 @@ angular.module('nuca').directive("picturesInput", [
       },
       templateUrl: "scripts/directives/picturesInput.html",
       replace: false,
-      controller: function($scope, $element, $attrs) {}
+      link: function(scope, element, attrs) {}
     };
   }
 ]);
@@ -434,7 +463,7 @@ angular.module('nuca').config([
       resolve: resolveAuth,
       label: 'Home'
     });
-    $routeProvider.when('/gestiune_cazari', {
+    $routeProvider.when('/administrare/cazari', {
       controller: 'AccomodationsController',
       templateUrl: 'views/accomodations/accomodations.html',
       resolve: resolveAuth
@@ -446,6 +475,11 @@ angular.module('nuca').config([
     $routeProvider.when('/confirmare_cerere/:id', {
       controller: 'ConfirmRequestController',
       templateUrl: 'views/requests/confirm_request.html'
+    });
+    $routeProvider.when('/administrare/harta', {
+      controller: 'RequestsMapController',
+      templateUrl: 'views/requests/requests_map.html',
+      resolve: resolveAuth
     });
     return $routeProvider.otherwise({
       redirectTo: '/'

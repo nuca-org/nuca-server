@@ -6743,6 +6743,10 @@ input.ng-invalid {
   border-color: #d9534f;
   outline-color: #d9534f;
 }
+.ng-invalid .form-control {
+  border-color: #d9534f;
+  outline-color: #d9534f;
+}
 a {
   cursor: pointer;
 }
