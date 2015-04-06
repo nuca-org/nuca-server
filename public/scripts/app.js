@@ -164,7 +164,7 @@ angular.module('nuca.controllers').controller('AccomodationPopUpController', [
       return DataHandler.process(messagePosts, function(data) {
         var action;
         action = $scope.addNew ? 'adaugata' : 'modificata';
-        return $modalInstance.close("Cazare " + action + " cu success");
+        return $modalInstance.close("Cazare " + action + " cu succes");
       });
     };
     return $scope.cancel = function() {
@@ -206,7 +206,7 @@ angular.module('nuca.controllers').controller('AccomodationsController', [
       return API.Accomodation["delete"]({
         id: acc.id
       }, function(data) {
-        toastr.success('Cazare eliminata cu success');
+        toastr.success('Cazare eliminata cu succes');
         return loadAccomodations();
       });
     };
@@ -214,24 +214,11 @@ angular.module('nuca.controllers').controller('AccomodationsController', [
   }
 ]);
 
-angular.module('nuca.controllers').controller('SterilizationReq1Controller', [
-  '$scope', 'API', function($scope, API) {
-    $scope.request = {
-      cats: [{}]
-    };
-    return $scope.createRequest = function() {
-      return API.SterilizationReq.add($scope.request, function(data) {
-        return $scope.goto('/confirmare_cerere/' + data.id);
-      });
-    };
-  }
-]);
-
-angular.module('nuca.controllers').controller('SterilizationReq2Controller', [
-  '$scope', '$routeParams', 'API', function($scope, $routeParams, API) {
+angular.module('nuca.controllers').controller('ConfirmRequestController', [
+  '$scope', '$routeParams', 'toastr', 'API', function($scope, $routeParams, toastr, API) {
     var loadRequest;
     loadRequest = function() {
-      return API.SterilizationReq.query({
+      return API.Request.query({
         id: $routeParams.id
       }, function(data) {
         return $scope.request = data[0];
@@ -239,19 +226,25 @@ angular.module('nuca.controllers').controller('SterilizationReq2Controller', [
     };
     $scope.removeCat = function(cat) {
       var idx;
-      if (confirm('Sunteti sigur ca doriti sa stergeti aceasta inregistrare?')) {
-        idx = $scope.request.cats.indexOf(cat);
-        return $scope.request.cats.splice(idx, 1);
+      if (!confirm('Sunteti sigur ca doriti sa stergeti aceasta inregistrare?')) {
+        return;
       }
+      idx = $scope.request.cats.indexOf(cat);
+      return $scope.request.cats.splice(idx, 1);
     };
     $scope.addCat = function() {
       return $scope.request.cats.push({});
     };
     $scope.updateRequest = function() {
-      return API.SterilizationReq.update({
+      if (!confirm('Sunteti sigur ca doriti sa trimiteti mai departe aceasta cerere?')) {
+        return;
+      }
+      $scope.editForm.$setPristine();
+      return API.Request.update({
         id: $routeParams.id
       }, $scope.request, function(data) {
-        return console.log(data);
+        toastr.success('Cerere trimisa cu succes');
+        return $scope.goto('/');
       });
     };
     $scope.openDatePicker = function($event) {
@@ -260,6 +253,19 @@ angular.module('nuca.controllers').controller('SterilizationReq2Controller', [
       return $scope.date_opened = true;
     };
     return loadRequest();
+  }
+]);
+
+angular.module('nuca.controllers').controller('NewRequestController', [
+  '$scope', 'API', function($scope, API) {
+    $scope.request = {
+      cats: [{}]
+    };
+    return $scope.createRequest = function() {
+      return API.Request.add($scope.request, function(data) {
+        return $scope.goto('/confirmare_cerere/' + data.id);
+      });
+    };
   }
 ]);
 
@@ -434,12 +440,12 @@ angular.module('nuca').config([
       resolve: resolveAuth
     });
     $routeProvider.when('/cerere_noua', {
-      controller: 'SterilizationReq1Controller',
-      templateUrl: 'views/sterilization_req/sterilization_req1.html'
+      controller: 'NewRequestController',
+      templateUrl: 'views/requests/new_request.html'
     });
     $routeProvider.when('/confirmare_cerere/:id', {
-      controller: 'SterilizationReq2Controller',
-      templateUrl: 'views/sterilization_req/sterilization_req2.html'
+      controller: 'ConfirmRequestController',
+      templateUrl: 'views/requests/confirm_request.html'
     });
     return $routeProvider.otherwise({
       redirectTo: '/'
@@ -520,8 +526,8 @@ angular.module('nuca.services').factory('API', [
     var api, createService, mapping, mappings, _i, _len;
     mappings = [
       {
-        name: 'SterilizationReq',
-        url: 'sterilization_req.json'
+        name: 'Request',
+        url: 'requests.json'
       }, {
         name: 'Accomodation',
         url: 'accomodations.json'

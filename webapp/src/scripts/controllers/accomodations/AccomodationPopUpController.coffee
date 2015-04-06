@@ -13,7 +13,7 @@ angular.module 'nuca.controllers'
 
     DataHandler.process messagePosts, (data) ->
       action = if $scope.addNew then 'adaugata' else 'modificata'
-      $modalInstance.close("Cazare #{action} cu success")
+      $modalInstance.close("Cazare #{action} cu succes")
 
   $scope.cancel = () ->
     $modalInstance.dismiss('cancel')

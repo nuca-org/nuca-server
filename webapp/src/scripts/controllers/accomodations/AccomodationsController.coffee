@@ -19,7 +19,7 @@ angular.module 'nuca.controllers'
   $scope.delete = (acc) ->
     return if !confirm('Sunteti sigur ca doriti sa eliminati aceasta cazare?')
     API.Accomodation.delete {id: acc.id}, (data) ->
-      toastr.success 'Cazare eliminata cu success'
+      toastr.success 'Cazare eliminata cu succes'
       loadAccomodations()
 
   loadAccomodations()

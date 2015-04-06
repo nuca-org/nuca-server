@@ -4,7 +4,7 @@ angular.module 'nuca.services'
   
   mappings = [
     # hospital
-    { name: 'SterilizationReq', url: 'sterilization_req.json' }
+    { name: 'Request', url: 'requests.json' }
     { name: 'Accomodation', url: 'accomodations.json' }
   ]
  

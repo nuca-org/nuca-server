@@ -31,8 +31,8 @@ angular.module 'nuca'
   #---- accomodations ------
   $routeProvider.when '/gestiune_cazari', controller: 'AccomodationsController', templateUrl: 'views/accomodations/accomodations.html', resolve: resolveAuth
   #---- sterilization requets ------
-  $routeProvider.when '/cerere_noua', controller: 'SterilizationReq1Controller', templateUrl: 'views/sterilization_req/sterilization_req1.html'
-  $routeProvider.when '/confirmare_cerere/:id', controller: 'SterilizationReq2Controller', templateUrl: 'views/sterilization_req/sterilization_req2.html'
+  $routeProvider.when '/cerere_noua', controller: 'NewRequestController', templateUrl: 'views/requests/new_request.html'
+  $routeProvider.when '/confirmare_cerere/:id', controller: 'ConfirmRequestController', templateUrl: 'views/requests/confirm_request.html'
   
 
   $routeProvider.otherwise redirectTo: '/'

@@ -13,42 +13,7 @@
                                     {{request.reporter_name + ' (' + request.email + ')'}}<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': prevDetailsOpen, 'glyphicon-chevron-right': !prevDetailsOpen}"></i>
                                 </div>
                             </accordion-heading>
-                            <div class="form-group">
-                                <label class="control-label col-sm-4">Nume</label>
-                                <div class="col-sm-8">
-                                    <input type="text" class="form-control" ng-model="request.reporter_name" placeholder="Nume si prenume">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-4">Email</label>
-                                <div class="col-sm-8">
-                                    <input type="email" class="form-control" ng-model="request.email">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="control-label col-sm-4">Telefon</label>
-                                <div class="col-sm-8">
-                                    <input type="tel" class="form-control" ng-model="request.reporter_phone" ng-required="true" ui-mask="(999) 999-9999">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-sm-8  col-sm-offset-4 checkbox">
-                                    <label tooltip="In cazul in care nu puteti captura pisicile introduceti mai jos contactul persoanei care le cunoaste mai bine">
-                                        <input type="checkbox" ng-model="request.reporter_cannot_capture">Nu le pot captura
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group" ng-show="request.reporter_cannot_capture">
-                                <label class="control-label col-sm-4">Nume intermediar</label>
-                                <div class="col-sm-8">
-                                    <input type="text" class="form-control" ng-model="request.intermediate_name" placeholder="Nume si prenume" ng-required="request.reporter_cannot_capture">
-                                </div>
-                            </div>
-                            <div class="form-group" ng-show="request.reporter_cannot_capture">
-                                <label class="control-label col-sm-4">Telefon intermediar</label>
-                                <div class="col-sm-8">
-                                    <input type="tel" class="form-control" ng-model="request.intermediate_phone" ui-mask="(999) 999-9999" ng-required="request.reporter_cannot_capture">
-                                </div>
+                            <div ng-include="'views/requests/_templates/contact.html'">
                             </div>
                         </accordion-group>
                     </accordion>
@@ -77,7 +42,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="control-label col-sm-4">Data/Timp</label>
+                        <label class="control-label col-sm-4">Data/Ora</label>
                         <div class="col-sm-8">
                             <div class="dropdown" dropdown is-open="request_date_open">
                                 <a class="dropdown-toggle" dropdown-toggle>
@@ -128,7 +93,7 @@
                         <div class="panel-heading">
                             <h3 class="panel-title">Despre Pisici</h3>
                         </div>
-                        <div class="panel-body" ng-include="'views/sterilization_req/_templates/cats.html'">
+                        <div class="panel-body" ng-include="'views/requests/_templates/cats.html'">
                         </div>
                     </div>
                 </div>
