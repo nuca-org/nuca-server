@@ -1,0 +1,52 @@
+﻿
+.datetime-input {
+    &.ng-invalid .form-control {
+        border-color: @brand-danger;
+        outline-color: @brand-danger;
+    }
+
+    .datetimepicker table tr td span {
+        margin: 0px
+    }
+}
+
+.choose-location {
+    position: relative;
+
+    .form-control {
+        width: 50%;
+        //width: 150px;
+        @media (min-width:@screen-xs) {
+            width: 70%;
+            //width: 250px;
+        }
+    }
+
+    .angular-google-map-container {
+        border: 1px solid #ccc;
+        height: 300px;
+
+        .window-content {
+            text-wrap: normal;
+        }
+    }
+}
+
+.ng-invalid > .choose-location .angular-google-map-container {
+    border-color: @brand-danger;
+}
+
+.request-map {
+    .angular-google-map-container {
+        border: 1px solid #ccc;
+        height: 300px;
+
+        @media (min-width:@screen-sm) {
+            height: 500px;
+        }
+
+        .window-content {
+            text-wrap: normal;
+        }
+    }
+}

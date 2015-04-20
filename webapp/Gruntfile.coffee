@@ -56,7 +56,7 @@ module.exports = (grunt) ->
   ]
   
   LESS_FILES = {}
-  LESS_FILES["#{BUILD_PATH}styles/main.css"] = "src/styles/**/*.less"
+  LESS_FILES["#{BUILD_PATH}styles/main.css"] = "src/styles/main.less"
 
   grunt.initConfig
     copy:

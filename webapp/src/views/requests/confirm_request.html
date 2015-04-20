@@ -20,25 +20,25 @@
                     <div class="form-group">
                         <label class="control-label col-sm-4">Numar pisici</label>
                         <div class="col-sm-4">
-                            <input type="number" class="form-control" ng-model="request.cats_no" min="1" max="100">
+                            <input type="number" class="form-control" ng-model="request.cats_no" min="1" max="100" ng-required="true">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-4">Pisici confirmate</label>
                         <div class="col-sm-4">
-                            <input type="number" class="form-control" ng-model="request.confirmed_cats_no" min="1" max="100">
+                            <input type="number" class="form-control" ng-model="request.confirmed_cats_no" min="1" max="100" ng-required="true">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-4">Numar custi</label>
                         <div class="col-sm-4">
-                            <input type="number" class="form-control" ng-model="request.cage_no" min="1" max="100">
+                            <input type="number" class="form-control" ng-model="request.cage_no" min="0" max="100" ng-required="true">
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="control-label col-sm-4">Custi capcana</label>
                         <div class="col-sm-4">
-                            <input type="number" class="form-control" ng-model="request.trap_cage_no" min="1" max="100">
+                            <input type="number" class="form-control" ng-model="request.trap_cage_no" min="0" max="100" ng-required="true">
                         </div>
                     </div>
                     <div class="form-group">

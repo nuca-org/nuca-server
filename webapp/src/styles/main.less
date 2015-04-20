@@ -2,6 +2,7 @@
 @import "../../bower_components/toastr/toastr";
 @import "font-awesome/css/font-awesome.min.css";
 @import "angular-bootstrap-datetimepicker/src/css/datetimepicker.css";
+@import "directives.less"; 
 
 // Load Bootstrap fonts from this directory.
 @icon-font-path: "bootstrap/fonts/";
@@ -11,11 +12,6 @@ body {
 }
 
 input.ng-invalid {
-    border-color: @brand-danger;
-    outline-color: @brand-danger;
-}
-
-.ng-invalid .form-control {
     border-color: @brand-danger;
     outline-color: @brand-danger;
 }
@@ -32,48 +28,7 @@ a.accordion-toggle {
     text-decoration: none;
 }
 
-.choose-location {
-    position: relative;
-
-    .form-control {
-        width: 50%;
-        //width: 150px;
-        @media (min-width:@screen-xs) {
-            width: 70%;
-            //width: 250px;
-        }
-    }
-
-    .angular-google-map-container {
-        border: 1px solid #ccc;
-        height: 300px;
-
-        .window-content {
-            text-wrap: normal;
-        }
-    }
-}
-
-.request-map {
-    .angular-google-map-container {
-        border: 1px solid #ccc;
-        height: 300px;
-
-        @media (min-width:@screen-sm) {
-            height: 500px;
-        }
-
-        .window-content {
-            text-wrap: normal;
-        }
-    }
-}
-
-
 .pac-container {
     z-index: 2000;
 }
 
-.ng-invalid > .choose-location .angular-google-map-container {
-    border-color: @brand-danger;
-}

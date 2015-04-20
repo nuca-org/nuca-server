@@ -6736,25 +6736,12 @@ button.toast-close-button {
     width: 25em;
   }
 }
-body {
-  padding-top: 70px;
-}
-input.ng-invalid {
+.datetime-input.ng-invalid .form-control {
   border-color: #d9534f;
   outline-color: #d9534f;
 }
-.ng-invalid .form-control {
-  border-color: #d9534f;
-  outline-color: #d9534f;
-}
-a {
-  cursor: pointer;
-}
-.table-cats {
-  min-width: 470px;
-}
-a.accordion-toggle {
-  text-decoration: none;
+.datetime-input .datetimepicker table tr td span {
+  margin: 0px;
 }
 .choose-location {
   position: relative;
@@ -6774,6 +6761,9 @@ a.accordion-toggle {
 .choose-location .angular-google-map-container .window-content {
   text-wrap: normal;
 }
+.ng-invalid > .choose-location .angular-google-map-container {
+  border-color: #d9534f;
+}
 .request-map .angular-google-map-container {
   border: 1px solid #ccc;
   height: 300px;
@@ -6786,9 +6776,22 @@ a.accordion-toggle {
 .request-map .angular-google-map-container .window-content {
   text-wrap: normal;
 }
+body {
+  padding-top: 70px;
+}
+input.ng-invalid {
+  border-color: #d9534f;
+  outline-color: #d9534f;
+}
+a {
+  cursor: pointer;
+}
+.table-cats {
+  min-width: 470px;
+}
+a.accordion-toggle {
+  text-decoration: none;
+}
 .pac-container {
   z-index: 2000;
-}
-.ng-invalid > .choose-location .angular-google-map-container {
-  border-color: #d9534f;
 }
