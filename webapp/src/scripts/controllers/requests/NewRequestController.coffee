@@ -3,6 +3,7 @@ angular.module 'nuca.controllers'
 .controller 'NewRequestController', ['$scope', 'API', ($scope, API) ->
 
   $scope.request = 
+    status: $scope.Const.Status.New
     cats: [{}]
 
   $scope.createRequest = () ->

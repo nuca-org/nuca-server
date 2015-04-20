@@ -3,14 +3,17 @@
         <h3 class="panel-title">Harta Cereri</h3>
     </div>
     <div class="panel-body">
-
         <form class="form-horizontal" name="editForm">
             <div class="row">
                 <div class="col-sm-12">
                     <div class="form-group">
                         <label class="control-label col-sm-2">Nume contact</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" placeholder="Nume si prenume" ng-model="filter.reporter_name">
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" placeholder="Nume si prenume" ng-model="filter.reporter_name" ng-model-options="{ debounce: 500 }">
+                        </div>
+                        <label class="control-label col-sm-1">Status</label>
+                        <div class="col-sm-4">
+                            <select class="form-control" ng-model="filter.status" ng-options="status.id as status.name for status in statuses"></select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -31,9 +34,13 @@
                 </div>
             </div>
         </form>
-        <!--TODO: implement map-->
         <div class="request-map">
             <ui-gmap-google-map center='map.center' zoom='map.zoom' control="mapControl">
+                <ui-gmap-markers models="map.markers" coords="'location'" icon="'icon'" click="'click'">
+                    <ui-gmap-windows show="show">
+                        <span ng-non-bindable class="window-content">{{title}}</span>
+                    </ui-gmap-windows>
+                </ui-gmap-markers>
             </ui-gmap-google-map>
         </div>
 </div>

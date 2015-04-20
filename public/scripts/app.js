@@ -111,21 +111,41 @@ angular.module('nuca.controllers', []);
 angular.module('nuca.controllers').controller('HomeController', ['$scope', 'API', 'toastr', function($scope, API, toastr) {}]);
 
 angular.module('nuca.controllers').controller('MainController', [
-  '$scope', '$location', '$window', '$modal', 'toastr', 'Config', 'Constants', 'Login', 'API', function($scope, $location, $window, $modal, toastr, Config, Constants, Login, API) {
+  '$scope', '$location', '$window', '$modal', 'toastr', 'Config', 'Const', 'Login', 'API', function($scope, $location, $window, $modal, toastr, Config, Const, Login, API) {
     var initMain;
     $scope.Config = Config;
-    $scope.Constants = Constants;
+    $scope.Const = Const;
     $scope.Login = Login;
     $scope.copyrightYear = (new Date()).getFullYear();
     $scope.genders = [
       {
         name: 'Nu stiu'
       }, {
-        id: 'M',
+        id: Const.Gender.Male,
         name: 'Mascul'
       }, {
-        id: 'F',
+        id: Const.Gender.Female,
         name: 'Femela'
+      }
+    ];
+    $scope.statuses = [
+      {
+        name: 'Oricare'
+      }, {
+        id: Const.Status.New,
+        name: 'Noi'
+      }, {
+        id: Const.Status.Confirmed,
+        name: 'Confirmate'
+      }, {
+        id: Const.Status.Transport,
+        name: 'Transport'
+      }, {
+        id: Const.Status.Accomodated,
+        name: 'Cazare'
+      }, {
+        id: Const.Status.Returned,
+        name: 'Returnate'
       }
     ];
     $scope.goto = function(target) {
@@ -247,11 +267,6 @@ angular.module('nuca.controllers').controller('ConfirmRequestController', [
         return $scope.goto('/');
       });
     };
-    $scope.openDatePicker = function($event) {
-      $event.preventDefault();
-      $event.stopPropagation();
-      return $scope.date_opened = true;
-    };
     return loadRequest();
   }
 ]);
@@ -259,6 +274,7 @@ angular.module('nuca.controllers').controller('ConfirmRequestController', [
 angular.module('nuca.controllers').controller('NewRequestController', [
   '$scope', 'API', function($scope, API) {
     $scope.request = {
+      status: $scope.Const.Status.New,
       cats: [{}]
     };
     return $scope.createRequest = function() {
@@ -271,14 +287,81 @@ angular.module('nuca.controllers').controller('NewRequestController', [
 
 angular.module('nuca.controllers').controller('RequestsMapController', [
   '$scope', 'API', function($scope, API) {
+    var loadAccomodations, loadMarkersFromAccomodations, loadMarkersFromRequests, searchRequests;
+    $scope.filter = {};
     $scope.mapControl = {};
-    return $scope.map = {
+    $scope.map = {
       center: {
         latitude: 46.766667,
         longitude: 23.58333300000004
       },
-      zoom: 17
+      zoom: 17,
+      markers: []
     };
+    loadAccomodations = function() {
+      return API.Accomodation.query({}, function(data) {
+        $scope.accomodations = data;
+        return loadMarkersFromAccomodations();
+      });
+    };
+    searchRequests = function() {
+      var param;
+      param = {};
+      if ($scope.filter.reporter_name) {
+        param.reporter_name = $scope.filter.reporter_name;
+      }
+      if ($scope.filter.status) {
+        param.status = $scope.filter.status;
+      }
+      return API.Request.query(param, function(data) {
+        $scope.requests = data;
+        return loadMarkersFromRequests();
+      });
+    };
+    loadMarkersFromAccomodations = function() {
+      var acc, marker, _i, _len, _ref, _results;
+      $scope.map.markers = $scope.map.markers.where(function(m) {
+        return m.type !== $scope.Const.MarkerType.Accomodation;
+      });
+      _ref = $scope.accomodations;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        acc = _ref[_i];
+        marker = {
+          id: acc.id,
+          location: acc.location,
+          title: acc.name,
+          type: $scope.Const.MarkerType.Accomodation,
+          icon: 'imgs/blue-dot.png'
+        };
+        _results.push($scope.map.markers.push(marker));
+      }
+      return _results;
+    };
+    loadMarkersFromRequests = function() {
+      var marker, request, _i, _len, _ref, _results;
+      $scope.map.markers = $scope.map.markers.where(function(m) {
+        return m.type !== $scope.Const.MarkerType.Request;
+      });
+      _ref = $scope.requests;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        request = _ref[_i];
+        marker = {
+          id: request.id,
+          location: request.location,
+          title: request.reporter_name,
+          type: $scope.Const.MarkerType.Request
+        };
+        _results.push($scope.map.markers.push(marker));
+      }
+      return _results;
+    };
+    $scope.$watch('filter', function(newValue, oldValue) {
+      return searchRequests();
+    }, true);
+    loadAccomodations();
+    return searchRequests();
   }
 ]);
 
@@ -446,10 +529,10 @@ angular.module('nuca').config([
     var angularRedirect, resolveAuth;
     resolveAuth = {
       auth: [
-        '$q', '$location', 'Constants', 'Login', function($q, $location, Constants, Login) {
+        '$q', '$location', 'Const', 'Login', function($q, $location, Const, Login) {
 
           /*
-          if !Login.isAuthenticated() && Constants.IsAuthPage($location.path())
+          if !Login.isAuthenticated() && Const.IsAuthPage($location.path())
             if $location.path() != '/' 
               Login.redirectToLogin(true)
             else
@@ -548,16 +631,26 @@ angular.module('nuca.config').constant('Config', {
   facebookAppId: '1499870690291074'
 });
 
-angular.module('nuca.constants').constant('Constants', {
-  Sex: {
-    Mascul: 0,
-    Femela: 1,
-    Rejected: 2
+angular.module('nuca.constants').constant('Const', {
+  Gender: {
+    Male: 0,
+    Female: 1
+  },
+  Status: {
+    New: 1,
+    Confirmed: 2,
+    Transport: 3,
+    Accomodated: 4,
+    Returned: 5
+  },
+  MarkerType: {
+    Accomodation: 1,
+    Reuquest: 2
   }
 });
 
 angular.module('nuca.login').factory('Login', [
-  '$window', '$location', '$rootScope', '$q', 'Constants', 'API', 'DataHandler', function($window, $location, $rootScope, $q, Constants, API, DataHandler) {
+  '$window', '$location', '$rootScope', '$q', 'Const', 'API', 'DataHandler', function($window, $location, $rootScope, $q, Const, API, DataHandler) {
     var login;
     login = {
       TODO: "implement"

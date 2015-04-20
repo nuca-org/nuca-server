@@ -1,6 +1,6 @@
 ﻿angular.module 'nuca.login'
 
-.factory 'Login', ['$window', '$location', '$rootScope', '$q', 'Constants', 'API', 'DataHandler', ($window, $location, $rootScope, $q, Constants, API, DataHandler) ->
+.factory 'Login', ['$window', '$location', '$rootScope', '$q', 'Const', 'API', 'DataHandler', ($window, $location, $rootScope, $q, Const, API, DataHandler) ->
 
   login =
     TODO: "implement"

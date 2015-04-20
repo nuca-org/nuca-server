@@ -1,10 +1,19 @@
 ﻿angular.module 'nuca.constants'
 
-.constant 'Constants', {
+.constant 'Const', {
       
-  Sex:
-    Mascul : 0
-    Femela : 1
-    Rejected : 2
+  Gender:
+    Male : 0
+    Female : 1
 
+  Status:
+    New: 1
+    Confirmed: 2
+    Transport: 3
+    Accomodated: 4
+    Returned: 5
+
+  MarkerType:
+    Accomodation: 1
+    Reuquest: 2
 }

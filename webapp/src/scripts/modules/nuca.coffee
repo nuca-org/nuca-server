@@ -3,10 +3,10 @@ angular.module 'nuca'
 .config ['$routeProvider', ($routeProvider) ->
 
   resolveAuth =
-    auth: ['$q', '$location', 'Constants', 'Login', ($q, $location, Constants, Login) ->
+    auth: ['$q', '$location', 'Const', 'Login', ($q, $location, Const, Login) ->
       #another hack to skip auth on the activation page
       ###
-      if !Login.isAuthenticated() && Constants.IsAuthPage($location.path())
+      if !Login.isAuthenticated() && Const.IsAuthPage($location.path())
         if $location.path() != '/' 
           Login.redirectToLogin(true)
         else

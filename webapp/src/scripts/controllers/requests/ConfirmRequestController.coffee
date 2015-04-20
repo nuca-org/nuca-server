@@ -21,10 +21,5 @@ angular.module 'nuca.controllers'
       toastr.success 'Cerere trimisa cu succes'
       $scope.goto '/'
 
-  $scope.openDatePicker = ($event) ->
-    $event.preventDefault()
-    $event.stopPropagation()
-    $scope.date_opened = true
-
   loadRequest()
 ]
